@@ -33,8 +33,11 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
     const battleLog: string[] = [...state.battleLog];
     let turnResult = '';
     
-    battleLog.push(`플레이어는 '${pAction}'을(를) 선택했습니다.`);
-    battleLog.push(`상대는 '${eAction}'을(를) 선택했습니다.`);
+    const pName = (state.gameMode === 'pvp' || state.gameMode === 'localPvp') ? '플레이어 1' : '플레이어';
+    const eName = (state.gameMode === 'pvp' || state.gameMode === 'localPvp') ? '플레이어 2' : '상대';
+
+    battleLog.push(`${pName}은(는) '${pAction}'을(를) 선택했습니다.`);
+    battleLog.push(`${eName}은(는) '${eAction}'을(를) 선택했습니다.`);
 
     let playerDamage = (pAction === 'fire') ? calculateProgressiveDamage(pFireCount) : 0;
     let enemyDamage = (eAction === 'fire') ? calculateProgressiveDamage(eFireCount) : 0;
@@ -46,10 +49,10 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         if (eAction === 'fire') {
             playerDamage += enemyDamage;
             enemyDamage = 0;
-            battleLog.push("💥 플레이어가 상대의 공격을 반사했습니다!");
+            battleLog.push(`💥 ${pName}이(가) ${eName}의 공격을 반사했습니다!`);
             playerDefended = true;
         } else {
-            battleLog.push("플레이어의 반사가 빗나갔습니다.");
+            battleLog.push(`${pName}의 반사가 빗나갔습니다.`);
         }
     }
     
@@ -59,10 +62,10 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         if (pAction === 'fire') {
             enemyDamage += playerDamage;
             playerDamage = 0;
-            battleLog.push("💥 상대가 플레이어의 공격을 반사했습니다!");
+            battleLog.push(`💥 ${eName}이(가) ${pName}의 공격을 반사했습니다!`);
             enemyDefended = true;
         } else {
-            battleLog.push("상대의 반사가 빗나갔습니다.");
+            battleLog.push(`${eName}의 반사가 빗나갔습니다.`);
         }
     }
 
@@ -70,9 +73,9 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         playerEvadeLeft--;
         if (eAction === 'fire') {
             enemyDamage = 0;
-            battleLog.push("플레이어가 공격을 회피했습니다!");
+            battleLog.push(`${pName}이(가) 공격을 회피했습니다!`);
         } else {
-             battleLog.push("플레이어의 회피가 빗나갔습니다.");
+             battleLog.push(`${pName}의 회피가 빗나갔습니다.`);
         }
     }
 
@@ -80,9 +83,9 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         enemyEvadeLeft--;
         if (pAction === 'fire') {
             playerDamage = 0;
-            battleLog.push("상대가 공격을 회피했습니다!");
+            battleLog.push(`${eName}이(가) 공격을 회피했습니다!`);
         } else {
-            battleLog.push("상대의 회피가 빗나갔습니다.");
+            battleLog.push(`${eName}의 회피가 빗나갔습니다.`);
         }
     }
 
@@ -98,34 +101,34 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         playerHealth = Math.min(6, playerHealth + 2);
         nextTurnPlayerVulnerable = true;
         playerHealLeft--;
-        battleLog.push("플레이어가 HP를 2 회복했습니다.");
+        battleLog.push(`${pName}이(가) HP를 2 회복했습니다.`);
     }
     if (eAction === 'heal') {
         enemyHealth = Math.min(6, enemyHealth + 2);
         nextTurnEnemyVulnerable = true;
         enemyHealLeft--;
-        battleLog.push("상대가 HP를 2 회복했습니다.");
+        battleLog.push(`${eName}이(가) HP를 2 회복했습니다.`);
     }
 
     if (pAction === 'load') {
         playerBullets = Math.min(5, playerBullets + 1);
-        battleLog.push("플레이어가 총알을 1개 장전했습니다.");
+        battleLog.push(`${pName}이(가) 총알을 1개 장전했습니다.`);
     }
     if (eAction === 'load') {
         enemyBullets = Math.min(5, enemyBullets + 1);
-        battleLog.push("상대가 총알을 1개 장전했습니다.");
+        battleLog.push(`${eName}이(가) 총알을 1개 장전했습니다.`);
     }
 
     // --- Damage Calculation ---
     if (playerDamage > 0) {
         const totalDamage = playerDamage + (state.enemyVulnerable ? 1 : 0);
         enemyHealth -= totalDamage;
-        battleLog.push(`💥 플레이어가 상대에게 ${totalDamage}의 데미지를 입혔습니다!`);
+        battleLog.push(`💥 ${pName}이(가) ${eName}에게 ${totalDamage}의 데미지를 입혔습니다!`);
     }
     if (enemyDamage > 0) {
         const totalDamage = enemyDamage + (state.playerVulnerable ? 1 : 0);
         playerHealth -= totalDamage;
-        battleLog.push(`💥 상대가 플레이어에게 ${totalDamage}의 데미지를 입혔습니다!`);
+        battleLog.push(`💥 ${eName}이(가) ${pName}에게 ${totalDamage}의 데미지를 입혔습니다!`);
     }
 
     if (playerDamage > 0 && enemyDamage > 0 && !playerDefended && !enemyDefended) {

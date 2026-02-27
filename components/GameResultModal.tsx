@@ -8,10 +8,17 @@ interface GameResultModalProps {
   onPlayAgain: () => void;
   onLobby: () => void;
   gameMode: GameMode;
+  playerId?: 'player1' | 'player2' | null;
 }
 
-const GameResultModal: React.FC<GameResultModalProps> = ({ result, onPlayAgain, onLobby, gameMode }) => {
-  const resultColor = result === '승리!' ? 'text-green-400' : result === '패배!' ? 'text-red-500' : 'text-yellow-400';
+const GameResultModal: React.FC<GameResultModalProps> = ({ result, onPlayAgain, onLobby, gameMode, playerId }) => {
+  let displayResult = result;
+  if (gameMode === 'pvp' && playerId === 'player2') {
+    if (result === '승리!') displayResult = '패배!';
+    else if (result === '패배!') displayResult = '승리!';
+  }
+
+  const resultColor = displayResult === '승리!' ? 'text-green-400' : displayResult === '패배!' ? 'text-red-500' : 'text-yellow-400';
 
   useEffect(() => {
     // PVE 게임일 때만 통계를 업데이트합니다.
@@ -24,7 +31,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ result, onPlayAgain, 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
       <div className="bg-gray-800 rounded-lg p-8 text-center max-w-sm border-2 border-yellow-500 shadow-lg">
-        <h2 className={`text-5xl font-bold mb-6 ${resultColor}`}>{result}</h2>
+        <h2 className={`text-5xl font-bold mb-6 ${resultColor}`}>{displayResult}</h2>
         <div className="flex space-x-4 justify-center">
           <button onClick={onPlayAgain} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
             다시하기

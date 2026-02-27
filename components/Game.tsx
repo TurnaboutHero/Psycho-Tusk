@@ -50,7 +50,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
       <main className="flex-grow flex flex-col md:flex-row min-h-0">
         <div className="w-full md:w-1/4 p-4 border-b md:border-b-0 md:border-r border-gray-700">
           <StatPanel
-            title={gameMode === 'localPvp' ? "플레이어 1" : "플레이어"}
+            title={gameMode === 'localPvp' ? "플레이어 1" : (gameMode === 'pvp' ? (state.playerId === 'player1' ? "나" : "상대 플레이어") : "플레이어")}
             health={state.playerHealth}
             bullets={state.playerBullets}
             defenseLeft={state.playerDefenseLeft}
@@ -65,7 +65,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         </div>
         <div className="w-full md:w-1/4 p-4 border-t md:border-t-0 md:border-l border-gray-700">
           <StatPanel
-            title={gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : (gameMode === 'localPvp' ? "플레이어 2" : "상대 플레이어")}
+            title={gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : (gameMode === 'localPvp' ? "플레이어 2" : (state.playerId === 'player2' ? "나" : "상대 플레이어"))}
             health={state.enemyHealth}
             bullets={state.enemyBullets}
             defenseLeft={state.enemyDefenseLeft}
@@ -80,7 +80,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         <BattleLog logs={state.battleLog} />
       </footer>
       {gameResult && (
-        <GameResultModal result={gameResult} onPlayAgain={handlePlayAgain} onLobby={handleLobby} gameMode={gameMode} />
+        <GameResultModal result={gameResult} onPlayAgain={handlePlayAgain} onLobby={handleLobby} gameMode={gameMode} playerId={state.playerId} />
       )}
       {showFireControls && <FireModal state={state} dispatch={dispatch} currentPlayer={currentPlayer} />}
       {gameMode === 'localPvp' && localPvpTurn === 'transition' && <PassDevice dispatch={dispatch} />}

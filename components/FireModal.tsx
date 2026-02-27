@@ -11,7 +11,7 @@ interface FireModalProps {
 
 const FireModal: React.FC<FireModalProps> = ({ state, dispatch, currentPlayer = 'player1' }) => {
   const { playerFireCount, gameMode, roomCode, playerId } = state;
-  const isPlayer2 = gameMode === 'localPvp' && currentPlayer === 'player2';
+  const isPlayer2 = (gameMode === 'localPvp' && currentPlayer === 'player2') || (gameMode === 'pvp' && playerId === 'player2');
 
   const handleConfirmFire = () => {
     const payload = { action: 'fire' as const, fireCount: playerFireCount };
@@ -25,8 +25,7 @@ const FireModal: React.FC<FireModalProps> = ({ state, dispatch, currentPlayer = 
         }
     } else if (gameMode === 'pvp' && roomCode && playerId) {
         networkService.sendAction(roomCode, playerId, payload);
-        // Also dispatch locally to update UI immediately
-        // dispatch({ type: 'SET_PLAYER_ACTION', payload });
+        dispatch({ type: 'SHOW_FIRE_CONTROLS', payload: false });
     }
   }
 

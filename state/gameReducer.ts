@@ -154,6 +154,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             ...state, // keep local state like playerId
             ...action.payload,
             playerId: state.playerId,
+            showFireControls: state.showFireControls, // Preserve local UI state
         };
     case 'SET_PUBLIC_ROOMS':
         return {

@@ -12,7 +12,7 @@ interface ActionBarProps {
 const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 'player1' }) => {
   const { gameMode, turnInProgress, playerAction, enemyAction, roomCode, playerId, highlightedAction } = state;
 
-  const isPlayer2 = gameMode === 'localPvp' && currentPlayer === 'player2';
+  const isPlayer2 = (gameMode === 'localPvp' && currentPlayer === 'player2') || (gameMode === 'pvp' && playerId === 'player2');
   const isTutorial = gameMode === 'tutorial';
 
   // Determine which player's stats to use

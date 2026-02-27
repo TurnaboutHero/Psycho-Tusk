@@ -18,18 +18,19 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
     dispatch({ type: 'SET_PUBLIC_ROOMS', payload: rooms });
   }, [dispatch]);
 
-  const handleCreateRoom = (isPublic: boolean) => {
-    const newRoomCode = networkService.createRoom(isPublic);
+  const handleCreateRoom = async (isPublic: boolean) => {
+    const newRoomCode = await networkService.createRoom(isPublic);
     dispatch({ type: 'SET_ROOM', payload: { roomCode: newRoomCode, playerId: 'player1' } });
   };
 
-  const handleJoinRoom = (code: string) => {
+  const handleJoinRoom = async (code: string) => {
     setError('');
     if (!code) {
         setError('방 코드를 입력해주세요.');
         return;
     }
-    if (networkService.joinRoom(code)) {
+    const success = await networkService.joinRoom(code);
+    if (success) {
       dispatch({ type: 'SET_ROOM', payload: { roomCode: code, playerId: 'player2' } });
     } else {
       setError('방을 찾을 수 없거나 가득 찼습니다.');
