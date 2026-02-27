@@ -10,8 +10,16 @@ class NetworkService {
     private socket: Socket | null = null;
     private listeners: ((update: any) => void)[] = [];
     private publicRoomCodes: string[] = [];
+    private sessionId: string;
 
     constructor() {
+        // Get or create session ID for reconnection
+        let storedSessionId = localStorage.getItem('pvp_session_id');
+        if (!storedSessionId) {
+            storedSessionId = Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('pvp_session_id', storedSessionId);
+        }
+        this.sessionId = storedSessionId;
         this.connect();
     }
 
@@ -28,6 +36,10 @@ class NetworkService {
             this.socket.on('ROOM_STATE_UPDATE', (state: GameState) => {
                 this.notify({ type: 'ROOM_STATE_UPDATE', payload: state });
             });
+
+            this.socket.on('EMOTE_RECEIVED', (playerId: 'player1' | 'player2', emote: string) => {
+                this.notify({ type: 'EMOTE_RECEIVED', payload: { playerId, emote } });
+            });
         }
     }
 
@@ -40,7 +52,7 @@ class NetworkService {
     public createRoom(isPublic: boolean): Promise<string> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('CREATE_ROOM', isPublic, (roomCode: string) => {
+            this.socket?.emit('CREATE_ROOM', isPublic, this.sessionId, (roomCode: string) => {
                 resolve(roomCode);
             });
         });
@@ -49,8 +61,17 @@ class NetworkService {
     public joinRoom(roomCode: string): Promise<boolean> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('JOIN_ROOM', roomCode, (success: boolean) => {
+            this.socket?.emit('JOIN_ROOM', roomCode, this.sessionId, (success: boolean) => {
                 resolve(success);
+            });
+        });
+    }
+
+    public reconnect(): Promise<{ success: boolean; state?: GameState; playerId?: 'player1' | 'player2' }> {
+        return new Promise((resolve) => {
+            if (!this.socket) this.connect();
+            this.socket?.emit('RECONNECT', this.sessionId, (success: boolean, state?: GameState, playerId?: 'player1' | 'player2') => {
+                resolve({ success, state, playerId });
             });
         });
     }
@@ -58,6 +79,11 @@ class NetworkService {
     public sendAction(roomCode: string, playerId: 'player1' | 'player2', payload: PlayerActionPayload) {
         if (!this.socket) this.connect();
         this.socket?.emit('SEND_ACTION', roomCode, playerId, payload);
+    }
+
+    public sendEmote(roomCode: string, playerId: 'player1' | 'player2', emote: string) {
+        if (!this.socket) this.connect();
+        this.socket?.emit('SEND_EMOTE', roomCode, playerId, emote);
     }
     
     public getPublicRooms(): string[] {

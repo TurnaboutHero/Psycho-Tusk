@@ -37,6 +37,10 @@ export const initialState: GameState = {
   showFireControls: false,
   animation: null,
   showHitEffect: null,
+  playerEmote: null,
+  enemyEmote: null,
+  playerDamageTaken: null,
+  enemyDamageTaken: null,
 
   // Tutorial State
   tutorialStep: 0,

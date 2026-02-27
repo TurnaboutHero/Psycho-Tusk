@@ -96,6 +96,11 @@ const App: React.FC = () => {
                 dispatch({ type: 'OPPONENT_JOINED' });
             }
             dispatch({ type: 'SYNC_STATE', payload: update.payload });
+        } else if (update.type === 'EMOTE_RECEIVED') {
+            dispatch({ type: 'SET_EMOTE', payload: { player: update.payload.playerId, emote: update.payload.emote } });
+            setTimeout(() => {
+                dispatch({ type: 'CLEAR_EMOTE', payload: { player: update.payload.playerId } });
+            }, 3000);
         }
     });
     
@@ -116,6 +121,7 @@ const App: React.FC = () => {
               return <Game state={state} dispatch={dispatch} />;
           case 'pvp':
               // If we are in pvp mode but haven't joined a room yet, show the PvpLobby
+              // Also show PvpLobby if we have a roomCode but the opponent hasn't joined yet
               if (!state.roomCode || !state.opponentJoined) {
                   return <PvpLobby state={state} dispatch={dispatch} />;
               }

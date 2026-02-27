@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Repeat, Crosshair, Plus, X } from 'lucide-react';
+import { Shield, Repeat, Crosshair, Plus, X, MessageCircle } from 'lucide-react';
 import type { GameState, GameAction, ActionType } from '../types';
 import { networkService } from '../utils/network';
 
@@ -64,6 +64,22 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
     return '';
   };
 
+  const [showEmotes, setShowEmotes] = React.useState(false);
+  const emotes = ['😎', '😡', '🏳️', '🎯', '🤔', '👍'];
+
+  const handleEmote = (emote: string) => {
+    if (gameMode === 'pvp' && roomCode && playerId) {
+      networkService.sendEmote(roomCode, playerId, emote);
+    } else {
+      // Local preview
+      dispatch({ type: 'SET_EMOTE', payload: { player: isPlayer2 ? 'player2' : 'player1', emote } });
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR_EMOTE', payload: { player: isPlayer2 ? 'player2' : 'player1' } });
+      }, 3000);
+    }
+    setShowEmotes(false);
+  };
+
 
   return (
     <div className="bg-gray-800 p-4">
@@ -72,7 +88,16 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
             {isPlayer2 ? '플레이어 2의 턴' : '플레이어 1의 턴'}
         </div>
       }
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-2 relative">
+        {showEmotes && (
+          <div className="absolute bottom-full left-0 mb-2 bg-gray-700 p-2 rounded-lg shadow-xl flex gap-2 z-50">
+            {emotes.map((e, i) => (
+              <button key={i} onClick={() => handleEmote(e)} className="text-2xl hover:scale-125 transition-transform">
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
         <button onClick={() => handleAction('load')} disabled={isActionDisabled || isButtonDisabledForTutorial('load')} className={`flex flex-col items-center justify-center bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-2 rounded-lg disabled:opacity-50 transition ${getButtonClass('load')}`}>
           <Repeat className="w-5 h-5 mb-1" />장전
         </button>
@@ -90,9 +115,14 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
           <Plus className="w-5 h-5 mb-1" />회복 ({healLeft})
         </button>
       </div>
-      { isActionDisabled && !turnInProgress && gameMode === 'pvp' &&
-        <p className="text-center text-yellow-300 mt-2 text-sm">상대방의 선택을 기다리는 중...</p>
-      }
+      <div className="mt-2 flex justify-between items-center">
+        <button onClick={() => setShowEmotes(!showEmotes)} className="text-gray-400 hover:text-white transition flex items-center gap-1 text-sm">
+          <MessageCircle className="w-4 h-4" /> 이모티콘
+        </button>
+        { isActionDisabled && !turnInProgress && gameMode === 'pvp' &&
+          <p className="text-yellow-300 text-sm">상대방의 선택을 기다리는 중...</p>
+        }
+      </div>
     </div>
   );
 };

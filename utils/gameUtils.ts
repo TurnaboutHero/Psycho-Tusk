@@ -172,5 +172,7 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
         turnResult,
         gameResult,
         showHitEffect: playerDamage > 0 && !enemyDefended ? 'enemy' : (enemyDamage > 0 && !playerDefended ? 'player' : null),
+        playerDamageTaken: enemyDamage > 0 && !playerDefended ? enemyDamage + (state.playerVulnerable ? 1 : 0) : null,
+        enemyDamageTaken: playerDamage > 0 && !enemyDefended ? playerDamage + (state.enemyVulnerable ? 1 : 0) : null,
     };
 };

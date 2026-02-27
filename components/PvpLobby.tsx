@@ -11,12 +11,36 @@ interface PvpLobbyProps {
 const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const [hasAttemptedReconnect, setHasAttemptedReconnect] = useState(false);
 
   useEffect(() => {
     // Fetch initial list of public rooms when component mounts
     const rooms = networkService.getPublicRooms();
     dispatch({ type: 'SET_PUBLIC_ROOMS', payload: rooms });
-  }, [dispatch]);
+    
+    // Attempt auto-reconnect only once when entering the lobby
+    const attemptReconnect = async () => {
+      if (hasAttemptedReconnect) return;
+      setHasAttemptedReconnect(true);
+      
+      setIsReconnecting(true);
+      const { success, state, playerId } = await networkService.reconnect();
+      if (success && state && playerId) {
+        dispatch({ type: 'SET_ROOM', payload: { roomCode: state.roomCode, playerId } });
+        dispatch({ type: 'SYNC_STATE', payload: state });
+        if (state.opponentJoined) {
+          dispatch({ type: 'OPPONENT_JOINED' });
+        }
+      }
+      setIsReconnecting(false);
+    };
+    
+    // Only attempt reconnect if we don't currently have a room
+    if (!state.roomCode) {
+      attemptReconnect();
+    }
+  }, [dispatch, hasAttemptedReconnect, state.roomCode]);
 
   const handleCreateRoom = async (isPublic: boolean) => {
     const newRoomCode = await networkService.createRoom(isPublic);
@@ -36,6 +60,14 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
       setError('방을 찾을 수 없거나 가득 찼습니다.');
     }
   };
+
+  if (isReconnecting) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900">
+        <div className="text-2xl font-bold text-blue-400 animate-pulse">이전 게임에 재접속 중...</div>
+      </div>
+    );
+  }
 
   if (state.roomCode && !state.opponentJoined) {
     return (

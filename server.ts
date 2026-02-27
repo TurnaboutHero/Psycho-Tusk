@@ -24,6 +24,7 @@ async function startServer() {
 
   const rooms = new Map<string, GameState>();
   const publicRoomCodes = new Set<string>();
+  const sessionToRoom = new Map<string, { roomCode: string, playerId: 'player1' | 'player2' }>();
 
   const broadcastPublicRooms = () => {
     io.emit("PUBLIC_ROOMS_UPDATE", Array.from(publicRoomCodes));
@@ -82,7 +83,7 @@ async function startServer() {
       socket.emit("PUBLIC_ROOMS_UPDATE", Array.from(publicRoomCodes));
     });
 
-    socket.on("CREATE_ROOM", (isPublic: boolean, callback: (roomCode: string) => void) => {
+    socket.on("CREATE_ROOM", (isPublic: boolean, sessionId: string, callback: (roomCode: string) => void) => {
       const roomCode = `PVP-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
       const newRoomState: GameState = {
           ...initialState,
@@ -99,10 +100,12 @@ async function startServer() {
       socket.join(roomCode);
       socket.data.roomCode = roomCode;
       socket.data.playerId = 'player1';
+      socket.data.sessionId = sessionId;
+      sessionToRoom.set(sessionId, { roomCode, playerId: 'player1' });
       callback(roomCode);
     });
 
-    socket.on("JOIN_ROOM", (roomCode: string, callback: (success: boolean, state?: GameState) => void) => {
+    socket.on("JOIN_ROOM", (roomCode: string, sessionId: string, callback: (success: boolean, state?: GameState) => void) => {
       const room = rooms.get(roomCode);
       if (room && !room.opponentJoined) {
           room.opponentJoined = true;
@@ -115,11 +118,40 @@ async function startServer() {
           socket.join(roomCode);
           socket.data.roomCode = roomCode;
           socket.data.playerId = 'player2';
+          socket.data.sessionId = sessionId;
+          sessionToRoom.set(sessionId, { roomCode, playerId: 'player2' });
           io.to(roomCode).emit("ROOM_STATE_UPDATE", room);
           callback(true, room);
       } else {
           callback(false);
       }
+    });
+
+    socket.on("RECONNECT", (sessionId: string, callback: (success: boolean, state?: GameState, playerId?: 'player1' | 'player2') => void) => {
+      const sessionInfo = sessionToRoom.get(sessionId);
+      if (sessionInfo) {
+        const room = rooms.get(sessionInfo.roomCode);
+        if (room) {
+          socket.join(sessionInfo.roomCode);
+          socket.data.roomCode = sessionInfo.roomCode;
+          socket.data.playerId = sessionInfo.playerId;
+          socket.data.sessionId = sessionId;
+          
+          // Clear any pending disconnect timeouts
+          if (socket.data.disconnectTimeout) {
+            clearTimeout(socket.data.disconnectTimeout);
+            socket.data.disconnectTimeout = null;
+          }
+          
+          callback(true, room, sessionInfo.playerId);
+          return;
+        }
+      }
+      callback(false);
+    });
+
+    socket.on("SEND_EMOTE", (roomCode: string, playerId: 'player1' | 'player2', emote: string) => {
+      io.to(roomCode).emit("EMOTE_RECEIVED", playerId, emote);
     });
 
     socket.on("SEND_ACTION", (roomCode: string, playerId: 'player1' | 'player2', payload: PlayerActionPayload) => {
@@ -144,20 +176,28 @@ async function startServer() {
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
       const roomCode = socket.data.roomCode;
+      const sessionId = socket.data.sessionId;
+      
       if (roomCode) {
-          const room = rooms.get(roomCode);
-          if (room) {
-              room.gameResult = socket.data.playerId === 'player1' ? '플레이어 1 연결 끊김' : '플레이어 2 연결 끊김';
-              io.to(roomCode).emit("ROOM_STATE_UPDATE", room);
-              
-              setTimeout(() => {
-                  rooms.delete(roomCode);
-                  if (publicRoomCodes.has(roomCode)) {
-                      publicRoomCodes.delete(roomCode);
-                      broadcastPublicRooms();
-                  }
-              }, 5000);
-          }
+          // Give the player 10 seconds to reconnect before ending the game
+          const timeout = setTimeout(() => {
+              const room = rooms.get(roomCode);
+              if (room) {
+                  room.gameResult = socket.data.playerId === 'player1' ? '플레이어 1 연결 끊김' : '플레이어 2 연결 끊김';
+                  io.to(roomCode).emit("ROOM_STATE_UPDATE", room);
+                  
+                  setTimeout(() => {
+                      rooms.delete(roomCode);
+                      if (publicRoomCodes.has(roomCode)) {
+                          publicRoomCodes.delete(roomCode);
+                          broadcastPublicRooms();
+                      }
+                      if (sessionId) sessionToRoom.delete(sessionId);
+                  }, 5000);
+              }
+          }, 10000);
+          
+          socket.data.disconnectTimeout = timeout;
       }
     });
   });

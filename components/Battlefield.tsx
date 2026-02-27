@@ -18,7 +18,7 @@ function usePrevious<T>(value: T): T | undefined {
 
 
 const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
-    const { turnInProgress, turnResult, playerAction, enemyAction, showHitEffect } = state;
+    const { turnInProgress, turnResult, playerAction, enemyAction, showHitEffect, playerEmote, enemyEmote, playerDamageTaken, enemyDamageTaken } = state;
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const prevTurnInProgress = usePrevious(turnInProgress);
@@ -56,13 +56,39 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
 
   return (
     <div className={`flex-grow flex items-center justify-around relative bg-gray-900/50 p-4 h-full ${isTransitioning ? 'animate-turn-transition' : ''}`}>
-      <PlayerCharacter action={turnInProgress ? playerCharAction : 'normal'} />
+      <div className={`relative ${playerDamageTaken && playerDamageTaken >= 3 ? 'animate-heavy-shake' : showHitEffect === 'player' ? 'animate-shake' : ''}`}>
+        <PlayerCharacter action={turnInProgress ? playerCharAction : 'normal'} />
+        {playerEmote && (
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-black px-3 py-1 rounded-full text-xl font-bold animate-pop-in shadow-lg z-20 whitespace-nowrap">
+            {playerEmote}
+          </div>
+        )}
+        {playerDamageTaken !== null && (
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 text-red-500 text-4xl font-black animate-float-up z-30 drop-shadow-md">
+            -{playerDamageTaken}
+          </div>
+        )}
+      </div>
+      
       {turnInProgress && turnResult && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 px-6 py-3 rounded-lg text-2xl font-bold text-yellow-300 animate-pulse z-10">
           {turnResult}
         </div>
       )}
-      <EnemyCharacter action={turnInProgress ? enemyCharAction : 'normal'} />
+      
+      <div className={`relative ${enemyDamageTaken && enemyDamageTaken >= 3 ? 'animate-heavy-shake' : showHitEffect === 'enemy' ? 'animate-shake' : ''}`}>
+        <EnemyCharacter action={turnInProgress ? enemyCharAction : 'normal'} />
+        {enemyEmote && (
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-black px-3 py-1 rounded-full text-xl font-bold animate-pop-in shadow-lg z-20 whitespace-nowrap">
+            {enemyEmote}
+          </div>
+        )}
+        {enemyDamageTaken !== null && (
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 text-red-500 text-4xl font-black animate-float-up z-30 drop-shadow-md">
+            -{enemyDamageTaken}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -51,6 +51,10 @@ export interface GameState {
   showFireControls: boolean;
   animation: string | null;
   showHitEffect: 'player' | 'enemy' | null;
+  playerEmote: string | null;
+  enemyEmote: string | null;
+  playerDamageTaken: number | null;
+  enemyDamageTaken: number | null;
   
   // Tutorial State
   tutorialStep: number;
@@ -87,4 +91,7 @@ export type GameAction =
   | { type: 'SYNC_STATE'; payload: GameState }
   | { type: 'SET_PUBLIC_ROOMS'; payload: string[] }
   | { type: 'ADVANCE_LOCAL_TURN' }
-  | { type: 'ADVANCE_TUTORIAL' };
+  | { type: 'ADVANCE_TUTORIAL' }
+  | { type: 'SET_EMOTE'; payload: { player: 'player1' | 'player2'; emote: string } }
+  | { type: 'CLEAR_EMOTE'; payload: { player: 'player1' | 'player2' } }
+  | { type: 'CLEAR_DAMAGE_TEXT' };

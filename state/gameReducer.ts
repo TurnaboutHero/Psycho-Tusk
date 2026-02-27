@@ -122,6 +122,8 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         turnResult: '',
         animation: null,
         showHitEffect: null,
+        playerDamageTaken: null,
+        enemyDamageTaken: null,
         timeLeft: 15,
         turnCount: state.turnCount + 1,
         localPvpTurn: state.gameMode === 'localPvp' ? 'player1' : state.localPvpTurn,
@@ -160,6 +162,22 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         return {
             ...state,
             publicRooms: action.payload,
+        };
+    case 'SET_EMOTE':
+        return {
+            ...state,
+            [action.payload.player === 'player1' ? 'playerEmote' : 'enemyEmote']: action.payload.emote,
+        };
+    case 'CLEAR_EMOTE':
+        return {
+            ...state,
+            [action.payload.player === 'player1' ? 'playerEmote' : 'enemyEmote']: null,
+        };
+    case 'CLEAR_DAMAGE_TEXT':
+        return {
+            ...state,
+            playerDamageTaken: null,
+            enemyDamageTaken: null,
         };
     default:
       return state;
