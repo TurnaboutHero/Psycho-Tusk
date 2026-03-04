@@ -90,7 +90,11 @@ const App: React.FC = () => {
     const unsubscribe = networkService.onStateUpdate(update => {
         if (update.type === 'PUBLIC_ROOMS_UPDATE') {
             dispatch({ type: 'SET_PUBLIC_ROOMS', payload: update.payload });
-        } else if (update.type === 'ROOM_STATE_UPDATE' && update.payload.roomCode === state.roomCode) {
+        } else if (update.type === 'ROOM_STATE_UPDATE') {
+            // If we have a roomCode, only accept updates for that room.
+            // If we don't have a roomCode yet, we accept the update (it's likely the one we just joined).
+            if (state.roomCode && update.payload.roomCode !== state.roomCode) return;
+            
             // If the game has started, sync the full state.
             if (update.payload.opponentJoined && !state.opponentJoined) {
                 dispatch({ type: 'OPPONENT_JOINED' });

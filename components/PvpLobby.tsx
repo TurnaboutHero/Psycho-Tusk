@@ -43,8 +43,9 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   }, [dispatch, hasAttemptedReconnect, state.roomCode]);
 
   const handleCreateRoom = async (isPublic: boolean) => {
-    const newRoomCode = await networkService.createRoom(isPublic);
-    dispatch({ type: 'SET_ROOM', payload: { roomCode: newRoomCode, playerId: 'player1' } });
+    const { roomCode, state } = await networkService.createRoom(isPublic);
+    dispatch({ type: 'SET_ROOM', payload: { roomCode, playerId: 'player1' } });
+    dispatch({ type: 'SYNC_STATE', payload: state });
   };
 
   const handleJoinRoom = async (code: string) => {
@@ -53,9 +54,13 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
         setError('방 코드를 입력해주세요.');
         return;
     }
-    const success = await networkService.joinRoom(code);
-    if (success) {
+    const { success, state } = await networkService.joinRoom(code);
+    if (success && state) {
       dispatch({ type: 'SET_ROOM', payload: { roomCode: code, playerId: 'player2' } });
+      dispatch({ type: 'SYNC_STATE', payload: state });
+      if (state.opponentJoined) {
+        dispatch({ type: 'OPPONENT_JOINED' });
+      }
     } else {
       setError('방을 찾을 수 없거나 가득 찼습니다.');
     }

@@ -49,20 +49,20 @@ class NetworkService {
 
     // --- Public API ---
 
-    public createRoom(isPublic: boolean): Promise<string> {
+    public createRoom(isPublic: boolean): Promise<{ roomCode: string; state: GameState }> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('CREATE_ROOM', isPublic, this.sessionId, (roomCode: string) => {
-                resolve(roomCode);
+            this.socket?.emit('CREATE_ROOM', isPublic, this.sessionId, (roomCode: string, state: GameState) => {
+                resolve({ roomCode, state });
             });
         });
     }
 
-    public joinRoom(roomCode: string): Promise<boolean> {
+    public joinRoom(roomCode: string): Promise<{ success: boolean; state?: GameState }> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('JOIN_ROOM', roomCode, this.sessionId, (success: boolean) => {
-                resolve(success);
+            this.socket?.emit('JOIN_ROOM', roomCode, this.sessionId, (success: boolean, state?: GameState) => {
+                resolve({ success, state });
             });
         });
     }

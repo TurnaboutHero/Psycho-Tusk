@@ -83,7 +83,7 @@ async function startServer() {
       socket.emit("PUBLIC_ROOMS_UPDATE", Array.from(publicRoomCodes));
     });
 
-    socket.on("CREATE_ROOM", (isPublic: boolean, sessionId: string, callback: (roomCode: string) => void) => {
+    socket.on("CREATE_ROOM", (isPublic: boolean, sessionId: string, callback: (roomCode: string, state: GameState) => void) => {
       const roomCode = `PVP-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
       const newRoomState: GameState = {
           ...initialState,
@@ -102,7 +102,7 @@ async function startServer() {
       socket.data.playerId = 'player1';
       socket.data.sessionId = sessionId;
       sessionToRoom.set(sessionId, { roomCode, playerId: 'player1' });
-      callback(roomCode);
+      callback(roomCode, newRoomState);
     });
 
     socket.on("JOIN_ROOM", (roomCode: string, sessionId: string, callback: (success: boolean, state?: GameState) => void) => {
