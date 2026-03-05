@@ -9,10 +9,35 @@ interface StatsScreenProps {
 }
 
 const StatsScreen: React.FC<StatsScreenProps> = ({ dispatch }) => {
-    const [stats, setStats] = useState<{ playerStats: PlayerStats; leaderboard: LeaderboardEntry[] } | null>(null);
+    const [stats, setStats] = useState<{ playerStats: any; leaderboard: any[] } | null>(null);
 
     useEffect(() => {
-        setStats(loadStats());
+        const fetchData = async () => {
+            const storedUser = localStorage.getItem('pvp_user');
+            let playerStats = { wins: 0, losses: 0, draws: 0, rating: 1200 };
+            
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                try {
+                    const res = await fetch(`/api/user/${user.id}`);
+                    if (res.ok) {
+                        playerStats = await res.json();
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch user stats", e);
+                }
+            }
+
+            try {
+                const res = await fetch('/api/leaderboard');
+                const leaderboard = await res.json();
+                setStats({ playerStats, leaderboard });
+            } catch (e) {
+                console.error("Failed to fetch leaderboard", e);
+                setStats({ playerStats, leaderboard: [] });
+            }
+        };
+        fetchData();
     }, []);
 
     if (!stats) {
@@ -20,7 +45,8 @@ const StatsScreen: React.FC<StatsScreenProps> = ({ dispatch }) => {
     }
 
     const { playerStats, leaderboard } = stats;
-    const sortedLeaderboard = [...leaderboard].sort((a, b) => b.rating - a.rating);
+    // Leaderboard is already sorted by server query
+    const sortedLeaderboard = leaderboard;
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 w-full max-w-4xl mx-auto">
@@ -29,7 +55,7 @@ const StatsScreen: React.FC<StatsScreenProps> = ({ dispatch }) => {
 
                 {/* Player Stats */}
                 <div className="mb-10">
-                    <h2 className="text-2xl font-semibold text-yellow-300 mb-4">나의 전적</h2>
+                    <h2 className="text-2xl font-semibold text-yellow-300 mb-4">나의 전적 ({playerStats.username || 'Guest'})</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                         <div className="bg-gray-700/50 p-4 rounded-lg">
                             <Trophy className="mx-auto mb-2 text-green-400" size={32} />
@@ -69,12 +95,18 @@ const StatsScreen: React.FC<StatsScreenProps> = ({ dispatch }) => {
                             </thead>
                             <tbody>
                                 {sortedLeaderboard.map((entry, index) => (
-                                    <tr key={entry.name} className={`border-t border-gray-700 ${entry.name === '플레이어' ? 'bg-blue-900/50' : ''}`}>
+                                    <tr key={index} className={`border-t border-gray-700 ${entry.username === playerStats.username ? 'bg-blue-900/50' : ''}`}>
                                         <td className="p-3 font-bold text-center w-16">
                                             {index === 0 ? <Crown className="mx-auto text-yellow-400" /> : index + 1}
                                         </td>
-                                        <td className="p-3 font-semibold">{entry.name}</td>
-                                        <td className="p-3 text-gray-400 hidden sm:table-cell">{entry.title}</td>
+                                        <td className="p-3 font-semibold">{entry.username}</td>
+                                        <td className="p-3 text-gray-400 hidden sm:table-cell">
+                                            {entry.rating >= 2000 ? '그랜드마스터' : 
+                                             entry.rating >= 1800 ? '마스터' : 
+                                             entry.rating >= 1600 ? '다이아몬드' : 
+                                             entry.rating >= 1400 ? '플래티넘' : 
+                                             entry.rating >= 1200 ? '골드' : '실버'}
+                                        </td>
                                         <td className="p-3 text-right font-mono">{entry.rating}</td>
                                     </tr>
                                 ))}

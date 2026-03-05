@@ -55,4 +55,7 @@ export const initialState: GameState = {
   
   // Local PVP state
   localPvpTurn: 'player1',
+  
+  // Network state
+  isConnected: false,
 };

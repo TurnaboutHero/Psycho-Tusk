@@ -26,7 +26,25 @@ class NetworkService {
     private connect() {
         if (!this.socket) {
             // Connect to the same host/port the app is running on
-            this.socket = io();
+            this.socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 5,
+            });
+
+            this.socket.on('connect', () => {
+                console.log('Connected to server with ID:', this.socket?.id);
+                this.notify({ type: 'CONNECTION_STATUS', payload: true });
+            });
+
+            this.socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                this.notify({ type: 'CONNECTION_STATUS', payload: false });
+            });
+
+            this.socket.on('connect_error', (err) => {
+                console.error('Connection error:', err);
+            });
 
             this.socket.on('PUBLIC_ROOMS_UPDATE', (rooms: string[]) => {
                 this.publicRoomCodes = rooms;
@@ -85,6 +103,11 @@ class NetworkService {
         if (!this.socket) this.connect();
         this.socket?.emit('SEND_EMOTE', roomCode, playerId, emote);
     }
+
+    public leaveRoom(roomCode: string) {
+        if (!this.socket) this.connect();
+        this.socket?.emit('LEAVE_ROOM', roomCode, this.sessionId);
+    }
     
     public getPublicRooms(): string[] {
         if (!this.socket) this.connect();
@@ -105,6 +128,11 @@ class NetworkService {
             this.socket.disconnect();
             this.socket = null;
         }
+    }
+
+    public registerUser(userId: string) {
+        if (!this.socket) this.connect();
+        this.socket?.emit('REGISTER_USER', userId);
     }
 }
 

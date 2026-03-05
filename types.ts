@@ -64,11 +64,16 @@ export interface GameState {
   // PVP state
   roomCode: string;
   playerId: 'player1' | 'player2' | null;
+  player1Id?: string; // Database User ID
+  player2Id?: string; // Database User ID
   opponentJoined: boolean;
   publicRooms: string[];
   
   // Local PVP state
   localPvpTurn: 'player1' | 'transition' | 'player2' | 'results';
+  
+  // Network state
+  isConnected: boolean;
 }
 
 export type GameAction =
@@ -94,4 +99,5 @@ export type GameAction =
   | { type: 'ADVANCE_TUTORIAL' }
   | { type: 'SET_EMOTE'; payload: { player: 'player1' | 'player2'; emote: string } }
   | { type: 'CLEAR_EMOTE'; payload: { player: 'player1' | 'player2' } }
-  | { type: 'CLEAR_DAMAGE_TEXT' };
+  | { type: 'CLEAR_DAMAGE_TEXT' }
+  | { type: 'SET_CONNECTION_STATUS'; payload: boolean };

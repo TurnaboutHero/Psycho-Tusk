@@ -12,24 +12,26 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
   const [isReconnecting, setIsReconnecting] = useState(false);
-  const [hasAttemptedReconnect, setHasAttemptedReconnect] = useState(false);
+  const hasAttemptedReconnect = React.useRef(false);
 
   useEffect(() => {
     // Fetch initial list of public rooms when component mounts
     const rooms = networkService.getPublicRooms();
     dispatch({ type: 'SET_PUBLIC_ROOMS', payload: rooms });
-    
+  }, [dispatch]);
+
+  useEffect(() => {
     // Attempt auto-reconnect only once when entering the lobby
     const attemptReconnect = async () => {
-      if (hasAttemptedReconnect) return;
-      setHasAttemptedReconnect(true);
+      if (hasAttemptedReconnect.current) return;
+      hasAttemptedReconnect.current = true;
       
       setIsReconnecting(true);
-      const { success, state, playerId } = await networkService.reconnect();
-      if (success && state && playerId) {
-        dispatch({ type: 'SET_ROOM', payload: { roomCode: state.roomCode, playerId } });
-        dispatch({ type: 'SYNC_STATE', payload: state });
-        if (state.opponentJoined) {
+      const { success, state: roomState, playerId } = await networkService.reconnect();
+      if (success && roomState && playerId) {
+        dispatch({ type: 'SET_ROOM', payload: { roomCode: roomState.roomCode, playerId } });
+        dispatch({ type: 'SYNC_STATE', payload: roomState });
+        if (roomState.opponentJoined) {
           dispatch({ type: 'OPPONENT_JOINED' });
         }
       }
@@ -40,7 +42,7 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
     if (!state.roomCode) {
       attemptReconnect();
     }
-  }, [dispatch, hasAttemptedReconnect, state.roomCode]);
+  }, [dispatch, state.roomCode]);
 
   const handleCreateRoom = async (isPublic: boolean) => {
     const { roomCode, state } = await networkService.createRoom(isPublic);
@@ -84,7 +86,10 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
             </div>
             <p className="text-yellow-400 animate-pulse">상대방을 기다리는 중...</p>
             {/* FIX: Changed action to GO_TO_LOBBY for consistency */}
-            <button onClick={() => dispatch({type: 'GO_TO_LOBBY'})} className="mt-6 w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+            <button onClick={() => {
+                networkService.leaveRoom(state.roomCode);
+                dispatch({type: 'GO_TO_LOBBY'});
+            }} className="mt-6 w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
                 로비로 돌아가기
             </button>
         </div>
@@ -95,7 +100,12 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-lg border border-gray-700">
-        <h1 className="text-3xl font-bold text-center mb-6 text-blue-400 flex items-center justify-center"><Gamepad2 className="mr-2"/>PVP 모드</h1>
+        <h1 className="text-3xl font-bold text-center mb-6 text-blue-400 flex items-center justify-center">
+            <Gamepad2 className="mr-2"/>PVP 모드
+        </h1>
+        <div className={`text-center mb-4 text-sm ${state.isConnected ? 'text-green-400' : 'text-red-400'}`}>
+            {state.isConnected ? '● 서버 연결됨' : '● 서버 연결 끊김 (재연결 중...)'}
+        </div>
         
         {/* Public Rooms List */}
         <div className="mb-6">
@@ -145,7 +155,12 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
         </div>
 
         {/* FIX: Changed action to GO_TO_LOBBY for consistency */}
-        <button onClick={() => dispatch({type: 'GO_TO_LOBBY'})} className="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
+        <button onClick={() => {
+            if (state.roomCode) {
+                networkService.leaveRoom(state.roomCode);
+            }
+            dispatch({type: 'GO_TO_LOBBY'});
+        }} className="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
             뒤로가기
         </button>
       </div>

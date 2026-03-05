@@ -83,10 +83,14 @@ const App: React.FC = () => {
   // PVP Network Effect
   useEffect(() => {
     if (state.gameMode !== 'pvp') {
-      networkService.disconnect();
+      // We don't disconnect anymore to keep the socket alive for faster switching
+      // networkService.disconnect(); 
       return;
     }
     
+    // Ensure we are connected when entering PVP mode
+    networkService.getPublicRooms();
+
     const unsubscribe = networkService.onStateUpdate(update => {
         if (update.type === 'PUBLIC_ROOMS_UPDATE') {
             dispatch({ type: 'SET_PUBLIC_ROOMS', payload: update.payload });
@@ -105,10 +109,13 @@ const App: React.FC = () => {
             setTimeout(() => {
                 dispatch({ type: 'CLEAR_EMOTE', payload: { player: update.payload.playerId } });
             }, 3000);
+        } else if (update.type === 'CONNECTION_STATUS') {
+            console.log('Connection status changed:', update.payload);
+            dispatch({ type: 'SET_CONNECTION_STATUS', payload: update.payload });
         }
     });
     
-    // When component unmounts or mode changes, disconnect.
+    // When component unmounts or mode changes, we just unsubscribe from updates
     return () => unsubscribe();
   }, [state.gameMode, state.roomCode, state.opponentJoined]);
 

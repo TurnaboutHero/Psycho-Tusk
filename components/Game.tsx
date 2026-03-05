@@ -11,6 +11,8 @@ import FireModal from './FireModal';
 import PassDevice from './PassDevice';
 import TutorialOverlay from './TutorialOverlay';
 
+import { networkService } from '../utils/network';
+
 interface GameProps {
   state: GameState;
   dispatch: React.Dispatch<GameAction>;
@@ -25,11 +27,17 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
     } else {
         // In PVP, play again logic would need network coordination.
         // For now, just go to lobby.
+        if (roomCode) {
+            networkService.leaveRoom(roomCode);
+        }
         dispatch({ type: 'GO_TO_LOBBY' });
     }
   };
 
   const handleLobby = () => {
+    if (gameMode === 'pvp' && roomCode) {
+        networkService.leaveRoom(roomCode);
+    }
     dispatch({ type: 'GO_TO_LOBBY' });
   };
 
@@ -45,7 +53,13 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col h-screen">
       <header className="p-4 border-b border-gray-700">
-        <Header gameMode={gameMode} roomCode={roomCode || (gameMode === 'localPvp' ? 'Local' : (gameMode === 'tutorial' ? 'Tutorial' : 'PVE'))} timeLeft={timeLeft} turnCount={turnCount} />
+        <Header 
+            gameMode={gameMode} 
+            roomCode={roomCode || (gameMode === 'localPvp' ? 'Local' : (gameMode === 'tutorial' ? 'Tutorial' : 'PVE'))} 
+            timeLeft={timeLeft} 
+            turnCount={turnCount} 
+            isConnected={state.isConnected}
+        />
       </header>
       <main className="flex-grow flex flex-col md:flex-row min-h-0">
         <div className="w-full md:w-1/4 p-4 border-b md:border-b-0 md:border-r border-gray-700">

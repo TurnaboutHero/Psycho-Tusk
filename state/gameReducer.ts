@@ -179,6 +179,11 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             playerDamageTaken: null,
             enemyDamageTaken: null,
         };
+    case 'SET_CONNECTION_STATUS':
+        return {
+            ...state,
+            isConnected: action.payload,
+        };
     default:
       return state;
   }
