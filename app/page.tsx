@@ -1,22 +1,20 @@
+"use client";
 
 import React, { useEffect, useReducer } from 'react';
-import { gameReducer } from './state/gameReducer';
-import { initialState } from './state/initialState';
-import { determineEnemyAction } from './utils/ai';
-import { networkService } from './utils/network';
-import Lobby from './components/Lobby';
-import Game from './components/Game';
-import PvpLobby from './components/PvpLobby';
-import StatsScreen from './components/StatsScreen';
+import { gameReducer } from '../state/gameReducer';
+import { initialState } from '../state/initialState';
+import { determineEnemyAction } from '../utils/ai';
+import { networkService } from '../utils/network';
+import Lobby from '../components/Lobby';
+import Game from '../components/Game';
+import PvpLobby from '../components/PvpLobby';
+import StatsScreen from '../components/StatsScreen';
 
-const App: React.FC = () => {
+export default function Home() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
   // Custom event listener to handle dispatches from outside React components
   useEffect(() => {
-    const rootElement = document.getElementById('root');
-    if (!rootElement) return;
-
     const handleDispatch = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
@@ -24,11 +22,11 @@ const App: React.FC = () => {
       }
     };
 
-    rootElement.addEventListener('dispatch', handleDispatch);
+    window.addEventListener('dispatch', handleDispatch);
     return () => {
-      rootElement.removeEventListener('dispatch', handleDispatch);
+      window.removeEventListener('dispatch', handleDispatch);
     };
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   // PVE Game Timer Effect
   useEffect(() => {
@@ -53,7 +51,6 @@ const App: React.FC = () => {
       getAIAction();
     }
   }, [state.gameMode, state.playerAction, state.isWaitingForAI, state, dispatch]);
-
 
   // Turn Processing Effect (PVE, Local PVP, Tutorial)
   useEffect(() => {
@@ -83,8 +80,6 @@ const App: React.FC = () => {
   // PVP Network Effect
   useEffect(() => {
     if (state.gameMode !== 'pvp') {
-      // We don't disconnect anymore to keep the socket alive for faster switching
-      // networkService.disconnect(); 
       return;
     }
     
@@ -95,11 +90,8 @@ const App: React.FC = () => {
         if (update.type === 'PUBLIC_ROOMS_UPDATE') {
             dispatch({ type: 'SET_PUBLIC_ROOMS', payload: update.payload });
         } else if (update.type === 'ROOM_STATE_UPDATE') {
-            // If we have a roomCode, only accept updates for that room.
-            // If we don't have a roomCode yet, we accept the update (it's likely the one we just joined).
             if (state.roomCode && update.payload.roomCode !== state.roomCode) return;
             
-            // If the game has started, sync the full state.
             if (update.payload.opponentJoined && !state.opponentJoined) {
                 dispatch({ type: 'OPPONENT_JOINED' });
             }
@@ -122,7 +114,6 @@ const App: React.FC = () => {
         }
     });
     
-    // When component unmounts or mode changes, we just unsubscribe from updates
     return () => unsubscribe();
   }, [state.gameMode, state.roomCode, state.opponentJoined]);
 
@@ -138,12 +129,9 @@ const App: React.FC = () => {
           case 'tutorial':
               return <Game state={state} dispatch={dispatch} />;
           case 'pvp':
-              // If we are in pvp mode but haven't joined a room yet, show the PvpLobby
-              // Also show PvpLobby if we have a roomCode but the opponent hasn't joined yet
               if (!state.roomCode || !state.opponentJoined) {
                   return <PvpLobby state={state} dispatch={dispatch} />;
               }
-              // Once opponent has joined, show the game board
               return <Game state={state} dispatch={dispatch} />;
           default:
               return <Lobby dispatch={dispatch} />;
@@ -151,10 +139,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col items-center min-h-screen bg-zinc-950 text-zinc-100">
       {renderContent()}
     </div>
   );
-};
-
-export default App;
+}

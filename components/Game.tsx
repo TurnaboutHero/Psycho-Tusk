@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { GameState, GameAction } from '../types';
 import Header from './Header';
 import Battlefield from './Battlefield';
@@ -12,6 +12,8 @@ import PassDevice from './PassDevice';
 import TutorialOverlay from './TutorialOverlay';
 import DisconnectOverlay from './DisconnectOverlay';
 import { networkService } from '../utils/network';
+import { Volume2, VolumeX } from 'lucide-react';
+import { AudioController } from '../utils/audio';
 
 interface GameProps {
   state: GameState;
@@ -32,6 +34,12 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
     opponentDisconnected,
     disconnectTimer
   } = state;
+
+  const [isMuted, setIsMuted] = useState(false);
+
+  const toggleMute = () => {
+    setIsMuted(AudioController.toggleMute());
+  };
 
   useEffect(() => {
     if (gameMode === 'pvp') {
@@ -55,6 +63,16 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
     }
   };
 
+  const handleNextRound = () => {
+    if (gameMode === 'pvp' && roomCode) {
+        networkService.nextRound(roomCode);
+    } else {
+        // For PVE/LocalPVP, we could implement local round logic here
+        // But for now, let's just reset the game if it's local
+        dispatch({ type: 'RESET_GAME' });
+    }
+  };
+
   const handleLobby = () => {
     if (gameMode === 'pvp' && roomCode) {
         networkService.leaveRoom(roomCode);
@@ -66,55 +84,77 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
   const isPlayer2Turn = gameMode === 'localPvp' && localPvpTurn === 'player2';
   
   const showActionBarForPlayers = isPlayer1Turn || isPlayer2Turn;
-  const showActionBarForTutorial = gameMode === 'tutorial' && highlightedAction !== null && tutorialStep < 8;
+  const showActionBarForTutorial = gameMode === 'tutorial' && highlightedAction !== null && tutorialStep < 5;
   const showActionBar = (gameMode !== 'tutorial' && showActionBarForPlayers) || showActionBarForTutorial;
 
   const currentPlayer = isPlayer2Turn ? 'player2' : 'player1';
 
+  const myWins = state.playerId === 'player2' ? state.p2Wins : state.p1Wins;
+  const oppWins = state.playerId === 'player2' ? state.p1Wins : state.p2Wins;
+
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col h-screen">
-      <header className="p-4 border-b border-gray-700">
-        <Header 
-            gameMode={gameMode} 
-            roomCode={roomCode || (gameMode === 'localPvp' ? 'Local' : (gameMode === 'tutorial' ? 'Tutorial' : 'PVE'))} 
-            timeLeft={timeLeft} 
-            turnCount={turnCount} 
-            isConnected={state.isConnected}
-        />
+    <div className="w-full max-w-4xl mx-auto flex flex-col h-screen bg-zinc-950 text-zinc-100 font-sans">
+      <header className="p-4 border-b border-zinc-800 flex justify-between items-center">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">심리터스크</h1>
+          <div className="text-xs text-zinc-500">Round {state.round} / Turn {turnCount}</div>
+        </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={toggleMute}
+            className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 transition-colors"
+            title={isMuted ? "소리 켜기" : "소리 끄기"}
+          >
+            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </button>
+          <div className="text-right">
+            <div className="text-xs text-zinc-500 uppercase">Score</div>
+            <div className="font-mono text-lg">{myWins} - {oppWins}</div>
+          </div>
+        </div>
       </header>
       <main className="flex-grow flex flex-col md:flex-row min-h-0">
-        <div className="w-full md:w-1/4 p-4 border-b md:border-b-0 md:border-r border-gray-700">
+        <div className="w-full md:w-1/4 p-4 border-b md:border-b-0 md:border-r border-zinc-800">
           <StatPanel
             title={gameMode === 'localPvp' ? "플레이어 1" : (gameMode === 'pvp' ? (state.playerId === 'player1' ? "나" : "상대 플레이어") : "플레이어")}
             health={state.playerHealth}
             bullets={state.playerBullets}
-            defenseLeft={state.playerDefenseLeft}
-            evadeLeft={state.playerEvadeLeft}
-            healLeft={state.playerHealLeft}
-            isVulnerable={state.playerVulnerable}
+            blockLeft={state.playerBlockLeft}
           />
         </div>
-        <div className="w-full md:w-1/2 flex-grow relative">
+        <div className="w-full md:w-1/2 flex-grow relative flex flex-col">
             <Battlefield state={state} />
             {gameMode === 'tutorial' && <TutorialOverlay state={state} dispatch={dispatch} />}
+            
+            {state.roomStatus === 'round_end' && (
+              <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-40 backdrop-blur-sm">
+                <div className="text-center space-y-6">
+                  <h2 className="text-4xl font-bold text-white">라운드 종료</h2>
+                  <div className="text-zinc-400">다음 라운드를 준비하세요.</div>
+                  <button 
+                    onClick={handleNextRound}
+                    className="bg-zinc-100 text-zinc-950 px-8 py-3 rounded-full font-bold hover:bg-zinc-300 transition-colors"
+                  >
+                    다음 라운드
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
-        <div className="w-full md:w-1/4 p-4 border-t md:border-t-0 md:border-l border-gray-700">
+        <div className="w-full md:w-1/4 p-4 border-t md:border-t-0 md:border-l border-zinc-800">
           <StatPanel
             title={gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : (gameMode === 'localPvp' ? "플레이어 2" : (state.playerId === 'player2' ? "나" : "상대 플레이어"))}
             health={state.enemyHealth}
             bullets={state.enemyBullets}
-            defenseLeft={state.enemyDefenseLeft}
-            evadeLeft={state.enemyEvadeLeft}
-            healLeft={state.enemyHealLeft}
-            isVulnerable={state.enemyVulnerable}
+            blockLeft={state.enemyBlockLeft}
           />
         </div>
       </main>
-      <footer className="border-t border-gray-700">
+      <footer className="border-t border-zinc-800">
         {showActionBar && <ActionBar state={state} dispatch={dispatch} currentPlayer={currentPlayer} />}
         <BattleLog logs={state.battleLog} />
       </footer>
-      {gameResult && (
+      {state.roomStatus === 'game_end' && gameResult && (
         <GameResultModal result={gameResult} onPlayAgain={handlePlayAgain} onLobby={handleLobby} gameMode={gameMode} playerId={state.playerId} />
       )}
       {showFireControls && <FireModal state={state} dispatch={dispatch} currentPlayer={currentPlayer} />}

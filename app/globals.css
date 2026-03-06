@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  background-color: #09090b; /* zinc-950 */
+  color: #fafafa; /* zinc-50 */
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+.animate-shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes muzzle-flash {
+  0% { opacity: 1; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(0); }
+}
+.muzzle-flash-fx {
+  animation: muzzle-flash 0.15s ease-out;
+}
+
+@keyframes shield-up {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.shield-up-fx {
+  animation: shield-up 0.2s ease-out;
+}
+
+@keyframes heal-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+.heal-fx {
+    animation: heal-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.animate-turn-transition {
+  animation: fade-in-out 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes float-up {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+}
+.animate-float-up {
+  animation: float-up 1s ease-out forwards;
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.5) translateY(10px); }
+  50% { transform: scale(1.2) translateY(-5px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes heavy-shake {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate3d(-8px, 0, 0) rotate(-2deg); }
+  20%, 40%, 60%, 80% { transform: translate3d(8px, 0, 0) rotate(2deg); }
+}
+.animate-heavy-shake {
+  animation: heavy-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}

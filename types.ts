@@ -1,9 +1,9 @@
 
 
 export type GameMode = 'lobby' | 'pve' | 'pvp' | 'localPvp' | 'tutorial' | 'stats';
-export type ActionType = 'load' | 'fire' | 'defend' | 'evade' | 'heal';
+export type ActionType = 'load' | 'fire' | 'block';
 
-export type CharacterAction = 'normal' | 'hit' | 'attack' | 'heavy-attack' | 'defend' | 'evade' | 'heal' | 'load';
+export type CharacterAction = 'normal' | 'hit' | 'attack' | 'heavy-attack' | 'block' | 'load';
 
 export interface CharacterProps {
   action?: CharacterAction;
@@ -27,10 +27,7 @@ export interface GameState {
   // Player state
   playerHealth: number;
   playerBullets: number;
-  playerDefenseLeft: number;
-  playerEvadeLeft: number;
-  playerHealLeft: number;
-  playerVulnerable: boolean;
+  playerBlockLeft: number;
   playerAction: ActionType | null;
   playerFireCount: number;
   playerRating: number;
@@ -38,10 +35,7 @@ export interface GameState {
   // Enemy/Opponent state
   enemyHealth: number;
   enemyBullets: number;
-  enemyDefenseLeft: number;
-  enemyEvadeLeft: number;
-  enemyHealLeft: number;
-  enemyVulnerable: boolean;
+  enemyBlockLeft: number;
   enemyAction: EnemyDecision | null;
 
   // AI-specific state
@@ -50,7 +44,7 @@ export interface GameState {
   // UI state
   showFireControls: boolean;
   animation: string | null;
-  showHitEffect: 'player' | 'enemy' | null;
+  showHitEffect: 'player' | 'enemy' | 'both' | null;
   playerEmote: string | null;
   enemyEmote: string | null;
   playerDamageTaken: number | null;
@@ -68,6 +62,12 @@ export interface GameState {
   player2Id?: string; // Database User ID
   opponentJoined: boolean;
   publicRooms: string[];
+  
+  // Round state
+  round: number;
+  p1Wins: number;
+  p2Wins: number;
+  roomStatus: 'waiting' | 'playing' | 'round_end' | 'game_end';
   
   // Connection state
   opponentDisconnected: boolean;

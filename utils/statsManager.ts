@@ -36,6 +36,9 @@ const getInitialStats = (): { playerStats: PlayerStats; leaderboard: Leaderboard
 };
 
 export const loadStats = (): { playerStats: PlayerStats; leaderboard: LeaderboardEntry[] } => {
+    if (typeof window === 'undefined') {
+        return getInitialStats();
+    }
     try {
         const storedStats = localStorage.getItem(STATS_STORAGE_KEY);
         if (storedStats) {
@@ -52,6 +55,7 @@ export const loadStats = (): { playerStats: PlayerStats; leaderboard: Leaderboar
 };
 
 const saveStats = (stats: { playerStats: PlayerStats; leaderboard: LeaderboardEntry[] }) => {
+    if (typeof window === 'undefined') return;
     try {
         localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(stats));
     } catch (error) {

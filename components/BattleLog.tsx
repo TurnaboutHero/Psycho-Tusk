@@ -14,9 +14,9 @@ const BattleLog: React.FC<BattleLogProps> = ({ logs }) => {
   }, [logs]);
 
   return (
-    <div className="bg-gray-900 p-4 border-t border-gray-700 max-h-32 overflow-y-auto" ref={logRef}>
+    <div className="bg-zinc-950 p-4 max-h-32 overflow-y-auto" ref={logRef}>
       {logs.map((log, index) => (
-        <div key={index} className={`text-xs py-1 border-b border-gray-800/50 ${log.startsWith('💥') ? 'text-yellow-300 font-bold' : ''}`}>
+        <div key={index} className={`text-xs py-1 border-b border-zinc-800/50 ${log.startsWith('💥') ? 'text-yellow-500 font-bold' : 'text-zinc-400'}`}>
           {log}
         </div>
       ))}

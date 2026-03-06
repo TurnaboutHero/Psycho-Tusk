@@ -15,13 +15,18 @@ class NetworkService {
 
     constructor() {
         // Get or create session ID for reconnection
-        let storedSessionId = localStorage.getItem('pvp_session_id');
-        if (!storedSessionId) {
-            storedSessionId = Math.random().toString(36).substring(2, 15);
-            localStorage.setItem('pvp_session_id', storedSessionId);
+        let storedSessionId = '';
+        if (typeof window !== 'undefined') {
+            storedSessionId = localStorage.getItem('pvp_session_id') || '';
+            if (!storedSessionId) {
+                storedSessionId = Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('pvp_session_id', storedSessionId);
+            }
         }
         this.sessionId = storedSessionId;
-        this.connect();
+        if (typeof window !== 'undefined') {
+            this.connect();
+        }
     }
 
     private connect() {
@@ -118,6 +123,11 @@ class NetworkService {
     public cancelMatch() {
         if (!this.socket) this.connect();
         this.socket?.emit('CANCEL_MATCH');
+    }
+
+    public nextRound(roomCode: string) {
+        if (!this.socket) this.connect();
+        this.socket?.emit('NEXT_ROUND', roomCode);
     }
 
     public sendAction(roomCode: string, playerId: 'player1' | 'player2', payload: PlayerActionPayload) {

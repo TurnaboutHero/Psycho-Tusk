@@ -155,7 +155,7 @@ export class SocketManager {
             const currentRoomState = this.rooms.get(roomCode);
             if (!currentRoomState) return;
 
-            if (currentRoomState.gameResult) {
+            if (currentRoomState.roomStatus === 'game_end') {
                 const p1Id = currentRoomState.player1Id;
                 const p2Id = currentRoomState.player2Id;
 
@@ -163,17 +163,9 @@ export class SocketManager {
                     if (currentRoomState.gameResult === '무승부!') {
                         this.updateStats(p1Id, p2Id, true);
                     } else if (currentRoomState.gameResult === '승리!') {
-                         if (currentRoomState.gameResult === '승리!') {
-                             this.updateStats(p1Id, p2Id, false);
-                         } else {
-                             this.updateStats(p2Id, p1Id, false);
-                         }
+                         this.updateStats(p1Id, p2Id, false);
                     } else if (currentRoomState.gameResult === '패배!') {
                         this.updateStats(p2Id, p1Id, false);
-                    } else if (currentRoomState.gameResult.includes('플레이어 1')) {
-                        this.updateStats(p2Id, p1Id, false);
-                    } else if (currentRoomState.gameResult.includes('플레이어 2')) {
-                        this.updateStats(p1Id, p2Id, false);
                     }
                 }
 
@@ -182,6 +174,11 @@ export class SocketManager {
                     this.publicRoomCodes.delete(roomCode);
                     this.broadcastPublicRooms();
                 }, 10000);
+                return;
+            }
+            
+            if (currentRoomState.roomStatus === 'round_end') {
+                // Wait for players to click "Next Round"
                 return;
             }
 
@@ -211,6 +208,36 @@ export class SocketManager {
 
             socket.on("REGISTER_USER", (userId: string) => {
                 this.socketToUser.set(socket.id, userId);
+            });
+
+            socket.on("NEXT_ROUND", (roomCode: string) => {
+                const room = this.rooms.get(roomCode);
+                if (!room || room.roomStatus !== 'round_end') return;
+
+                const nextRoundState: GameState = {
+                    ...room,
+                    playerHealth: 5,
+                    enemyHealth: 5,
+                    playerBullets: 0,
+                    enemyBullets: 0,
+                    playerBlockLeft: 3,
+                    enemyBlockLeft: 3,
+                    playerAction: null,
+                    enemyAction: null,
+                    playerFireCount: 1,
+                    turnCount: 1,
+                    round: room.round + 1,
+                    roomStatus: 'playing',
+                    turnInProgress: false,
+                    turnResult: '',
+                    battleLog: [`라운드 ${room.round + 1} 시작!`],
+                    playerDamageTaken: null,
+                    enemyDamageTaken: null,
+                    showHitEffect: null,
+                };
+
+                this.rooms.set(roomCode, nextRoundState);
+                this.io.to(roomCode).emit("ROOM_STATE_UPDATE", nextRoundState);
             });
 
             socket.on("GET_PUBLIC_ROOMS", () => {

@@ -11,23 +11,17 @@ export const initialState: GameState = {
   turnResult: '',
 
   // Player state
-  playerHealth: 6,
-  playerBullets: 1,
-  playerDefenseLeft: 3,
-  playerEvadeLeft: 1,
-  playerHealLeft: 2,
-  playerVulnerable: false,
+  playerHealth: 5,
+  playerBullets: 0,
+  playerBlockLeft: 3,
   playerAction: null,
   playerFireCount: 1,
   playerRating: 1200,
 
   // Enemy/Opponent state
-  enemyHealth: 6,
-  enemyBullets: 1,
-  enemyDefenseLeft: 3,
-  enemyEvadeLeft: 1,
-  enemyHealLeft: 2,
-  enemyVulnerable: false,
+  enemyHealth: 5,
+  enemyBullets: 0,
+  enemyBlockLeft: 3,
   enemyAction: null,
 
   // AI-specific state
@@ -54,6 +48,13 @@ export const initialState: GameState = {
   player2Id: undefined,
   opponentJoined: false,
   publicRooms: [],
+  
+  // Round state
+  round: 1,
+  p1Wins: 0,
+  p2Wins: 0,
+  roomStatus: 'waiting',
+
   opponentDisconnected: false,
   disconnectTimer: null,
   

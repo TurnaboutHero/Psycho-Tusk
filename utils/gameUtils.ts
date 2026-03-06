@@ -1,18 +1,8 @@
 import type { GameState } from '../types';
 
-export const calculateProgressiveDamage = (fireCount: number): number => {
-  if (fireCount <= 0) return 0;
-  if (fireCount <= 3) return fireCount;
-  if (fireCount === 4) return 5;
-  if (fireCount >= 5) return 7;
-  return 0; // Should not happen with bullet limits
-};
-
 const actionNameMap: Record<string, string> = {
     'fire': '발사',
-    'defend': '반사',
-    'evade': '회피',
-    'heal': '회복',
+    'block': '방어',
     'load': '장전'
 };
 
@@ -26,17 +16,11 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
 
     let playerHealth = state.playerHealth;
     let playerBullets = state.playerBullets;
-    let playerDefenseLeft = state.playerDefenseLeft;
-    let playerEvadeLeft = state.playerEvadeLeft;
-    let playerHealLeft = state.playerHealLeft;
-    let nextTurnPlayerVulnerable = false;
+    let playerBlockLeft = state.playerBlockLeft;
     
     let enemyHealth = state.enemyHealth;
     let enemyBullets = state.enemyBullets;
-    let enemyDefenseLeft = state.enemyDefenseLeft;
-    let enemyEvadeLeft = state.enemyEvadeLeft;
-    let enemyHealLeft = state.enemyHealLeft;
-    let nextTurnEnemyVulnerable = false;
+    let enemyBlockLeft = state.enemyBlockLeft;
 
     const battleLog: string[] = [...state.battleLog];
     let turnResult = '';
@@ -49,150 +33,153 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
 
     battleLog.push(`▶ [${pName}] ${pActionName} 🆚 [${eName}] ${eActionName}`);
 
-    let playerDamage = (pAction === 'fire') ? calculateProgressiveDamage(pFireCount) : 0;
-    let enemyDamage = (eAction === 'fire') ? calculateProgressiveDamage(eFireCount) : 0;
-    
-    // --- Interaction Phase ---
-    let playerDefended = false;
-    if (pAction === 'defend') {
-        playerDefenseLeft--;
-        if (eAction === 'fire') {
-            playerDamage += enemyDamage;
-            enemyDamage = 0;
-            battleLog.push(`🛡️ ${pName}이(가) 공격을 반사했습니다!`);
-            playerDefended = true;
-        } else {
-            battleLog.push(`🛡️ ${pName}의 반사가 빗나갔습니다.`);
-        }
-    }
-    
-    let enemyDefended = false;
-    if (eAction === 'defend') {
-        enemyDefenseLeft--;
-        if (pAction === 'fire') {
-            enemyDamage += playerDamage;
-            playerDamage = 0;
-            battleLog.push(`🛡️ ${eName}이(가) 공격을 반사했습니다!`);
-            enemyDefended = true;
-        } else {
-            battleLog.push(`🛡️ ${eName}의 반사가 빗나갔습니다.`);
-        }
-    }
+    let playerDamageToEnemy = 0;
+    let enemyDamageToPlayer = 0;
 
-    if (pAction === 'evade') {
-        playerEvadeLeft--;
-        if (eAction === 'fire') {
-            enemyDamage = 0;
-            battleLog.push(`💨 ${pName}이(가) 공격을 회피했습니다!`);
-        } else {
-             battleLog.push(`💨 ${pName}의 회피가 빗나갔습니다.`);
-        }
-    }
-
-    if (eAction === 'evade') {
-        enemyEvadeLeft--;
-        if (pAction === 'fire') {
-            playerDamage = 0;
-            battleLog.push(`💨 ${eName}이(가) 공격을 회피했습니다!`);
-        } else {
-            battleLog.push(`💨 ${eName}의 회피가 빗나갔습니다.`);
-        }
-    }
-
-    // --- Action Resolution Phase ---
     if (pAction === 'fire') {
         playerBullets -= pFireCount;
+        playerDamageToEnemy = pFireCount;
     }
     if (eAction === 'fire') {
         enemyBullets -= eFireCount;
-    }
-
-    if (pAction === 'heal') {
-        playerHealth = Math.min(6, playerHealth + 2);
-        nextTurnPlayerVulnerable = true;
-        playerHealLeft--;
-        battleLog.push(`✨ ${pName}이(가) 체력을 회복했습니다. (다음 턴 취약)`);
-    }
-    if (eAction === 'heal') {
-        enemyHealth = Math.min(6, enemyHealth + 2);
-        nextTurnEnemyVulnerable = true;
-        enemyHealLeft--;
-        battleLog.push(`✨ ${eName}이(가) 체력을 회복했습니다. (다음 턴 취약)`);
+        enemyDamageToPlayer = eFireCount;
     }
 
     if (pAction === 'load') {
         playerBullets = Math.min(5, playerBullets + 1);
-        battleLog.push(`🔄 ${pName}이(가) 장전했습니다.`);
     }
     if (eAction === 'load') {
         enemyBullets = Math.min(5, enemyBullets + 1);
-        battleLog.push(`🔄 ${eName}이(가) 장전했습니다.`);
     }
 
-    // --- Damage Calculation ---
-    if (playerDamage > 0) {
-        const totalDamage = playerDamage + (state.enemyVulnerable ? 1 : 0);
-        enemyHealth -= totalDamage;
-        const vulnText = state.enemyVulnerable ? ' (취약 상태 +1)' : '';
+    let playerDefended = false;
+    let enemyDefended = false;
+
+    if (pAction === 'block' && eAction === 'block') {
+        battleLog.push(`🛡️ 양측 모두 방어했습니다. (방어 횟수 차감 없음)`);
+    } else {
+        if (pAction === 'block') {
+            playerBlockLeft--;
+            if (eAction === 'fire') {
+                playerDamageToEnemy += enemyDamageToPlayer;
+                enemyDamageToPlayer = 0;
+                playerDefended = true;
+                battleLog.push(`🛡️ ${pName}이(가) 공격을 반사했습니다!`);
+            } else {
+                battleLog.push(`🛡️ ${pName}의 방어가 낭비되었습니다.`);
+            }
+        }
+        if (eAction === 'block') {
+            enemyBlockLeft--;
+            if (pAction === 'fire') {
+                enemyDamageToPlayer += playerDamageToEnemy;
+                playerDamageToEnemy = 0;
+                enemyDefended = true;
+                battleLog.push(`🛡️ ${eName}이(가) 공격을 반사했습니다!`);
+            } else {
+                battleLog.push(`🛡️ ${eName}의 방어가 낭비되었습니다.`);
+            }
+        }
+    }
+
+    if (playerDamageToEnemy > 0) {
+        enemyHealth -= playerDamageToEnemy;
         if (playerDefended) {
-            battleLog.push(`💥 반사된 공격으로 ${eName}이(가) ${totalDamage}의 데미지를 입었습니다!${vulnText}`);
+            battleLog.push(`💥 반사된 공격으로 ${eName}이(가) ${playerDamageToEnemy}의 데미지를 입었습니다!`);
         } else {
-            battleLog.push(`💥 ${pName}이(가) ${eName}에게 ${totalDamage}의 데미지를 입혔습니다!${vulnText}`);
+            battleLog.push(`💥 ${pName}이(가) ${eName}에게 ${playerDamageToEnemy}의 데미지를 입혔습니다!`);
         }
     }
-    if (enemyDamage > 0) {
-        const totalDamage = enemyDamage + (state.playerVulnerable ? 1 : 0);
-        playerHealth -= totalDamage;
-        const vulnText = state.playerVulnerable ? ' (취약 상태 +1)' : '';
+    
+    if (enemyDamageToPlayer > 0) {
+        playerHealth -= enemyDamageToPlayer;
         if (enemyDefended) {
-            battleLog.push(`💥 반사된 공격으로 ${pName}이(가) ${totalDamage}의 데미지를 입었습니다!${vulnText}`);
+            battleLog.push(`💥 반사된 공격으로 ${pName}이(가) ${enemyDamageToPlayer}의 데미지를 입었습니다!`);
         } else {
-            battleLog.push(`💥 ${eName}이(가) ${pName}에게 ${totalDamage}의 데미지를 입혔습니다!${vulnText}`);
+            battleLog.push(`💥 ${eName}이(가) ${pName}에게 ${enemyDamageToPlayer}의 데미지를 입혔습니다!`);
         }
     }
 
-    if (playerDamage > 0 && enemyDamage > 0 && !playerDefended && !enemyDefended) {
+    if (playerDamageToEnemy > 0 && enemyDamageToPlayer > 0 && !playerDefended && !enemyDefended) {
         turnResult = '총격전!';
-    } else if (playerDamage > 0) {
+    } else if (playerDamageToEnemy > 0) {
         turnResult = '공격 성공!';
-    } else if (enemyDamage > 0) {
+    } else if (enemyDamageToPlayer > 0) {
         turnResult = '공격 당함!';
     } else {
         turnResult = '교착 상태';
     }
 
-    // --- Game Over Check ---
+    // Game Over Check
     let gameResult = '';
+    let p1Wins = state.p1Wins;
+    let p2Wins = state.p2Wins;
+    let roomStatus = state.roomStatus;
+    let round = state.round;
+
+    let roundEnded = false;
+    let p1WonRound = false;
+    let p2WonRound = false;
+
     if (playerHealth <= 0 && enemyHealth <= 0) {
-        gameResult = '무승부!';
+        roundEnded = true;
         playerHealth = 0;
         enemyHealth = 0;
     } else if (enemyHealth <= 0) {
-        gameResult = '승리!';
+        roundEnded = true;
+        p1WonRound = true;
         enemyHealth = 0;
     } else if (playerHealth <= 0) {
-        gameResult = '패배!';
+        roundEnded = true;
+        p2WonRound = true;
         playerHealth = 0;
+    } else if (state.turnCount >= 20) {
+        roundEnded = true;
+        if (playerHealth > enemyHealth) {
+            p1WonRound = true;
+        } else if (enemyHealth > playerHealth) {
+            p2WonRound = true;
+        }
+    }
+
+    if (roundEnded) {
+        if (p1WonRound) p1Wins += 1;
+        if (p2WonRound) p2Wins += 1;
+
+        if (p1Wins >= 2 || p2Wins >= 2 || round >= 3) {
+            roomStatus = 'game_end';
+            if (p1Wins > p2Wins) gameResult = '승리!';
+            else if (p2Wins > p1Wins) gameResult = '패배!';
+            else gameResult = '무승부!';
+        } else {
+            roomStatus = 'round_end';
+        }
+    }
+
+    let hitEffect: 'player' | 'enemy' | 'both' | null = null;
+    if (playerDamageToEnemy > 0 && enemyDamageToPlayer > 0) {
+        hitEffect = 'both';
+    } else if (playerDamageToEnemy > 0) {
+        hitEffect = 'enemy';
+    } else if (enemyDamageToPlayer > 0) {
+        hitEffect = 'player';
     }
 
     return {
         playerHealth,
         playerBullets,
-        playerDefenseLeft,
-        playerEvadeLeft,
-        playerHealLeft,
-        playerVulnerable: nextTurnPlayerVulnerable,
+        playerBlockLeft,
         enemyHealth,
         enemyBullets,
-        enemyDefenseLeft,
-        enemyEvadeLeft,
-        enemyHealLeft,
-        enemyVulnerable: nextTurnEnemyVulnerable,
+        enemyBlockLeft,
         battleLog,
         turnResult,
         gameResult,
-        showHitEffect: playerDamage > 0 && !enemyDefended ? 'enemy' : (enemyDamage > 0 && !playerDefended ? 'player' : null),
-        playerDamageTaken: enemyDamage > 0 && !playerDefended ? enemyDamage + (state.playerVulnerable ? 1 : 0) : null,
-        enemyDamageTaken: playerDamage > 0 && !enemyDefended ? playerDamage + (state.enemyVulnerable ? 1 : 0) : null,
+        p1Wins,
+        p2Wins,
+        roomStatus,
+        showHitEffect: hitEffect,
+        playerDamageTaken: enemyDamageToPlayer > 0 ? enemyDamageToPlayer : null,
+        enemyDamageTaken: playerDamageToEnemy > 0 ? playerDamageToEnemy : null,
     };
 };
