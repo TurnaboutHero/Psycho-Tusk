@@ -12,12 +12,23 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const hasAttemptedReconnect = React.useRef(false);
 
   useEffect(() => {
     // Fetch initial list of public rooms when component mounts
     const rooms = networkService.getPublicRooms();
     dispatch({ type: 'SET_PUBLIC_ROOMS', payload: rooms });
+
+    const unsubscribe = networkService.onStateUpdate((update) => {
+        if (update.type === 'MATCHMAKING_STARTED') {
+            setIsSearching(true);
+        } else if (update.type === 'MATCHMAKING_CANCELLED') {
+            setIsSearching(false);
+        }
+    });
+
+    return () => unsubscribe();
   }, [dispatch]);
 
   useEffect(() => {
@@ -107,6 +118,32 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
             {state.isConnected ? '● 서버 연결됨' : '● 서버 연결 끊김 (재연결 중...)'}
         </div>
         
+        {/* Ranked Matchmaking */}
+        <div className="mb-8">
+            {isSearching ? (
+                <div className="bg-gray-900/50 border border-blue-500/50 rounded-lg p-6 text-center animate-pulse">
+                    <h2 className="text-xl font-bold text-blue-400 mb-2">상대방을 찾는 중...</h2>
+                    <p className="text-gray-400 text-sm mb-4">비슷한 실력의 상대를 찾고 있습니다.</p>
+                    <button 
+                        onClick={() => networkService.cancelMatch()}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                    >
+                        취소
+                    </button>
+                </div>
+            ) : (
+                <button 
+                    onClick={() => networkService.findMatch()}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-lg shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-3"
+                >
+                    <Gamepad2 size={24} />
+                    <span className="text-lg">랭크 매치 찾기</span>
+                </button>
+            )}
+        </div>
+
+        <hr className="border-gray-600 my-6" />
+
         {/* Public Rooms List */}
         <div className="mb-6">
             <h2 className="text-xl font-semibold text-yellow-300 mb-2">공개 방</h2>

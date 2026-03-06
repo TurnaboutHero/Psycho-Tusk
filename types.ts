@@ -69,6 +69,10 @@ export interface GameState {
   opponentJoined: boolean;
   publicRooms: string[];
   
+  // Connection state
+  opponentDisconnected: boolean;
+  disconnectTimer: number | null; // Seconds remaining until forfeit
+  
   // Local PVP state
   localPvpTurn: 'player1' | 'transition' | 'player2' | 'results';
   
@@ -100,4 +104,5 @@ export type GameAction =
   | { type: 'SET_EMOTE'; payload: { player: 'player1' | 'player2'; emote: string } }
   | { type: 'CLEAR_EMOTE'; payload: { player: 'player1' | 'player2' } }
   | { type: 'CLEAR_DAMAGE_TEXT' }
-  | { type: 'SET_CONNECTION_STATUS'; payload: boolean };
+  | { type: 'SET_CONNECTION_STATUS'; payload: boolean }
+  | { type: 'SET_OPPONENT_DISCONNECTED'; payload: { disconnected: boolean; timer: number | null } };

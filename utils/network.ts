@@ -11,6 +11,7 @@ class NetworkService {
     private listeners: ((update: any) => void)[] = [];
     private publicRoomCodes: string[] = [];
     private sessionId: string;
+    private userId: string | null = null;
 
     constructor() {
         // Get or create session ID for reconnection
@@ -35,6 +36,9 @@ class NetworkService {
             this.socket.on('connect', () => {
                 console.log('Connected to server with ID:', this.socket?.id);
                 this.notify({ type: 'CONNECTION_STATUS', payload: true });
+                if (this.userId) {
+                    this.socket?.emit('REGISTER_USER', this.userId);
+                }
             });
 
             this.socket.on('disconnect', () => {
@@ -57,6 +61,18 @@ class NetworkService {
 
             this.socket.on('EMOTE_RECEIVED', (playerId: 'player1' | 'player2', emote: string) => {
                 this.notify({ type: 'EMOTE_RECEIVED', payload: { playerId, emote } });
+            });
+
+            this.socket.on('MATCH_FOUND', (payload: { roomCode: string, playerId: 'player1' | 'player2', state: GameState }) => {
+                this.notify({ type: 'MATCH_FOUND', payload });
+            });
+
+            this.socket.on('MATCHMAKING_STARTED', () => {
+                this.notify({ type: 'MATCHMAKING_STARTED' });
+            });
+
+            this.socket.on('MATCHMAKING_CANCELLED', () => {
+                this.notify({ type: 'MATCHMAKING_CANCELLED' });
             });
         }
     }
@@ -92,6 +108,16 @@ class NetworkService {
                 resolve({ success, state, playerId });
             });
         });
+    }
+
+    public findMatch() {
+        if (!this.socket) this.connect();
+        this.socket?.emit('FIND_MATCH', this.sessionId);
+    }
+
+    public cancelMatch() {
+        if (!this.socket) this.connect();
+        this.socket?.emit('CANCEL_MATCH');
     }
 
     public sendAction(roomCode: string, playerId: 'player1' | 'player2', payload: PlayerActionPayload) {
@@ -131,6 +157,7 @@ class NetworkService {
     }
 
     public registerUser(userId: string) {
+        this.userId = userId;
         if (!this.socket) this.connect();
         this.socket?.emit('REGISTER_USER', userId);
     }

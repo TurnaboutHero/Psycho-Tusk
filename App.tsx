@@ -112,6 +112,13 @@ const App: React.FC = () => {
         } else if (update.type === 'CONNECTION_STATUS') {
             console.log('Connection status changed:', update.payload);
             dispatch({ type: 'SET_CONNECTION_STATUS', payload: update.payload });
+        } else if (update.type === 'MATCH_FOUND') {
+            const { roomCode, playerId, state: roomState } = update.payload;
+            dispatch({ type: 'SET_ROOM', payload: { roomCode, playerId } });
+            dispatch({ type: 'SYNC_STATE', payload: roomState });
+            if (roomState.opponentJoined) {
+                dispatch({ type: 'OPPONENT_JOINED' });
+            }
         }
     });
     

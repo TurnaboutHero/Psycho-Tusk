@@ -50,8 +50,12 @@ export const initialState: GameState = {
   // PVP state
   roomCode: '',
   playerId: null,
+  player1Id: undefined,
+  player2Id: undefined,
   opponentJoined: false,
   publicRooms: [],
+  opponentDisconnected: false,
+  disconnectTimer: null,
   
   // Local PVP state
   localPvpTurn: 'player1',

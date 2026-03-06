@@ -184,6 +184,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             ...state,
             isConnected: action.payload,
         };
+    case 'SET_OPPONENT_DISCONNECTED':
+        return {
+            ...state,
+            opponentDisconnected: action.payload.disconnected,
+            disconnectTimer: action.payload.timer,
+        };
     default:
       return state;
   }

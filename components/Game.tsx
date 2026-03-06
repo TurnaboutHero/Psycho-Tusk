@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { GameState, GameAction } from '../types';
 import Header from './Header';
 import Battlefield from './Battlefield';
@@ -10,7 +10,7 @@ import GameResultModal from './GameResultModal';
 import FireModal from './FireModal';
 import PassDevice from './PassDevice';
 import TutorialOverlay from './TutorialOverlay';
-
+import DisconnectOverlay from './DisconnectOverlay';
 import { networkService } from '../utils/network';
 
 interface GameProps {
@@ -19,7 +19,28 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = ({ state, dispatch }) => {
-  const { gameMode, roomCode, timeLeft, turnCount, gameResult, showFireControls, localPvpTurn, tutorialStep, highlightedAction } = state;
+  const { 
+    gameMode, 
+    roomCode, 
+    timeLeft, 
+    turnCount, 
+    gameResult, 
+    showFireControls, 
+    localPvpTurn, 
+    tutorialStep, 
+    highlightedAction,
+    opponentDisconnected,
+    disconnectTimer
+  } = state;
+
+  useEffect(() => {
+    if (gameMode === 'pvp') {
+        const unsubscribe = networkService.onStateUpdate((newState) => {
+            dispatch({ type: 'SYNC_STATE', payload: newState });
+        });
+        return () => unsubscribe();
+    }
+  }, [gameMode, dispatch]);
 
   const handlePlayAgain = () => {
     if (gameMode === 'pve' || gameMode === 'localPvp') {
@@ -98,6 +119,11 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
       )}
       {showFireControls && <FireModal state={state} dispatch={dispatch} currentPlayer={currentPlayer} />}
       {gameMode === 'localPvp' && localPvpTurn === 'transition' && <PassDevice dispatch={dispatch} />}
+      
+      <DisconnectOverlay 
+        isVisible={!!opponentDisconnected} 
+        initialTimer={disconnectTimer} 
+      />
     </div>
   );
 };
