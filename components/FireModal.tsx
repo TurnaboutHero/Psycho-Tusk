@@ -37,29 +37,29 @@ const FireModal: React.FC<FireModalProps> = ({ state, dispatch, currentPlayer = 
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-zinc-900 rounded-3xl p-8 border border-zinc-800 shadow-2xl w-full max-w-sm mx-4"
+        className="bg-zinc-900 rounded-3xl p-6 sm:p-8 border border-zinc-800 shadow-2xl w-full max-w-sm mx-4"
       >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-red-500/10 p-3 rounded-2xl">
-            <Crosshair className="w-6 h-6 text-red-500" />
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+          <div className="bg-red-500/10 p-2.5 sm:p-3 rounded-2xl">
+            <Crosshair className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-zinc-100 tracking-tight">발사 제어</h3>
-            <p className="text-sm text-zinc-500">{isPlayer2 ? "플레이어 2" : "플레이어 1"}</p>
+            <h3 className="text-lg sm:text-xl font-bold text-zinc-100 tracking-tight">발사 제어</h3>
+            <p className="text-xs sm:text-sm text-zinc-500">{isPlayer2 ? "플레이어 2" : "플레이어 1"}</p>
           </div>
         </div>
 
-        <div className="bg-zinc-950 rounded-2xl p-6 mb-8 border border-zinc-800/50">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-zinc-400 font-medium">사용할 총알</span>
-            <div className="flex items-center gap-4 bg-zinc-900 rounded-xl p-1 border border-zinc-800">
+        <div className="bg-zinc-950 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-zinc-800/50">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <span className="text-sm sm:text-base text-zinc-400 font-medium">사용할 총알</span>
+            <div className="flex items-center gap-2 sm:gap-4 bg-zinc-900 rounded-xl p-1 border border-zinc-800">
               <button 
                 onClick={() => dispatch({ type: 'SET_PLAYER_FIRE_COUNT', payload: Math.max(1, playerFireCount - 1) })} 
                 className="w-10 h-10 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors text-zinc-300"
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="text-2xl font-bold w-8 text-center text-zinc-100 font-mono">{playerFireCount}</span>
+              <span className="text-xl sm:text-2xl font-bold w-6 sm:w-8 text-center text-zinc-100 font-mono">{playerFireCount}</span>
               <button 
                 onClick={() => dispatch({ type: 'SET_PLAYER_FIRE_COUNT', payload: Math.min(maxBullets, playerFireCount + 1) })} 
                 className="w-10 h-10 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors text-zinc-300"
@@ -69,24 +69,24 @@ const FireModal: React.FC<FireModalProps> = ({ state, dispatch, currentPlayer = 
             </div>
           </div>
           
-          <div className="flex items-center justify-between pt-6 border-t border-zinc-800/50">
-            <span className="text-zinc-400 font-medium">예상 데미지</span>
-            <span className="text-3xl font-black text-red-500">
+          <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-zinc-800/50">
+            <span className="text-sm sm:text-base text-zinc-400 font-medium">예상 데미지</span>
+            <span className="text-2xl sm:text-3xl font-black text-red-500">
               {playerFireCount}
             </span>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3">
           <button 
             onClick={() => dispatch({ type: 'SHOW_FIRE_CONTROLS', payload: false })} 
-            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-4 px-4 rounded-xl transition-colors"
+            className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 sm:py-4 px-4 rounded-xl transition-colors text-sm sm:text-base"
           >
             취소
           </button>
           <button 
             onClick={handleConfirmFire} 
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-4 rounded-xl transition-colors shadow-lg shadow-red-500/20"
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 sm:py-4 px-4 rounded-xl transition-colors shadow-lg shadow-red-500/20 text-sm sm:text-base"
           >
             발사 확인
           </button>

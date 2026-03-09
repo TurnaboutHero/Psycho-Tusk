@@ -20,9 +20,9 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ state, dispatch }) =>
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="fixed inset-x-0 top-16 sm:top-20 z-50 flex justify-center px-4 pointer-events-none"
+          className="fixed inset-x-0 top-12 sm:top-20 z-50 flex justify-center px-2 sm:px-4 pointer-events-none"
         >
-          <div className="bg-zinc-900/95 border border-zinc-700/50 rounded-xl p-3 sm:p-4 max-w-lg w-full shadow-2xl pointer-events-auto backdrop-blur-md flex flex-col relative">
+          <div className="bg-zinc-900/95 border border-zinc-700/50 rounded-xl p-2.5 sm:p-4 max-w-lg w-full shadow-2xl pointer-events-auto backdrop-blur-md flex flex-col relative">
             {!isFinalStep && (
               <button 
                 onClick={() => dispatch({ type: 'GO_TO_LOBBY' })}

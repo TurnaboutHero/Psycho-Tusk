@@ -86,7 +86,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
   }
 
   return (
-    <div className="bg-zinc-900 p-4 sm:p-6 border-t border-zinc-800">
+    <div className="bg-zinc-900 p-3 sm:p-6 border-t border-zinc-800">
        { gameMode === 'localPvp' && 
         <div className="text-center text-sm sm:text-lg font-bold text-yellow-500 mb-3 sm:mb-4">
             {isPlayer2 ? '플레이어 2의 턴' : '플레이어 1의 턴'}

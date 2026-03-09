@@ -163,7 +163,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     }
 
   return (
-    <div className={`flex-grow flex flex-col sm:flex-row items-center justify-around relative bg-zinc-900/30 p-4 h-full rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
+    <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-900/30 p-2 sm:p-4 h-full rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
       <div className={`relative ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
         <EnemyCharacter action={turnInProgress ? displayEnemyAction : 'normal'} />
         {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles />}
