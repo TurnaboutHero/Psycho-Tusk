@@ -7,7 +7,7 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
   const baseStyle = { filter: action === 'hit' ? 'drop-shadow(0 0 12px #ff0000)' : 'none' };
   
   return (
-    <svg width="150" height="300" viewBox="0 0 150 300" style={baseStyle}>
+    <svg className="w-24 h-48 sm:w-32 sm:h-64 md:w-[150px] md:h-[300px]" viewBox="0 0 150 300" style={baseStyle}>
       <g className={action === 'hit' ? 'animate-shake' : ''}>
         <g 
           transform={action === 'attack' ? 'translate(20, 0)' : action === 'heavy-attack' ? 'translate(25, 0) rotate(-2)' : action === 'block' ? 'translate(0, 5)' : 'translate(0, 0)'} 
@@ -78,7 +78,7 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
   const baseStyle = { filter: action === 'hit' ? 'drop-shadow(0 0 12px #ff0000)' : 'none' };
   
   return (
-    <svg width="150" height="300" viewBox="0 0 150 300" style={baseStyle}>
+    <svg className="w-24 h-48 sm:w-32 sm:h-64 md:w-[150px] md:h-[300px]" viewBox="0 0 150 300" style={baseStyle}>
       <g className={action === 'hit' ? 'animate-shake' : ''}>
         <g 
           transform={action === 'attack' ? 'translate(-20, 0)' : action === 'heavy-attack' ? 'translate(-25, 0) rotate(2)' : action === 'block' ? 'translate(0, 5)' : 'translate(0, 0)'} 

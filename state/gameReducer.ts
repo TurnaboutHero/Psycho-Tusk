@@ -113,7 +113,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
     }
     case 'NEXT_TURN': {
-      if (state.gameResult) return state;
+      if (state.gameResult) {
+        return {
+          ...state,
+          turnInProgress: false,
+        };
+      }
       return {
         ...state,
         playerAction: null,

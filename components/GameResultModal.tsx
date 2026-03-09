@@ -34,14 +34,14 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ result, onPlayAgain, 
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-zinc-900 rounded-2xl p-10 text-center max-w-sm border border-zinc-800 shadow-2xl"
+        className="bg-zinc-900 rounded-2xl p-6 sm:p-10 text-center w-[90%] max-w-sm border border-zinc-800 shadow-2xl"
       >
-        <h2 className={`text-5xl font-bold mb-8 tracking-tighter ${resultColor}`}>{displayResult}</h2>
+        <h2 className={`text-4xl sm:text-5xl font-bold mb-6 sm:mb-8 tracking-tighter ${resultColor}`}>{displayResult}</h2>
         <div className="flex flex-col space-y-3 justify-center">
-          <button onClick={onPlayAgain} className="w-full bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-bold py-3 px-6 rounded-xl transition-colors">
+          <button onClick={onPlayAgain} className="w-full bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-bold py-3 px-6 rounded-xl transition-colors text-sm sm:text-base">
             다시하기
           </button>
-          <button onClick={onLobby} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold py-3 px-6 rounded-xl transition-colors">
+          <button onClick={onLobby} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold py-3 px-6 rounded-xl transition-colors text-sm sm:text-base">
             로비로 돌아가기
           </button>
         </div>

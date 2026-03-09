@@ -2,7 +2,7 @@ import type { GameState } from '../types';
 
 const actionNameMap: Record<string, string> = {
     'fire': '발사',
-    'block': '방어',
+    'block': '반사',
     'load': '장전'
 };
 
@@ -56,7 +56,7 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
     let enemyDefended = false;
 
     if (pAction === 'block' && eAction === 'block') {
-        battleLog.push(`🛡️ 양측 모두 방어했습니다. (방어 횟수 차감 없음)`);
+        battleLog.push(`🛡️ 양측 모두 반사를 시도했습니다. (반사 횟수 차감 없음)`);
     } else {
         if (pAction === 'block') {
             playerBlockLeft--;
@@ -66,7 +66,7 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
                 playerDefended = true;
                 battleLog.push(`🛡️ ${pName}이(가) 공격을 반사했습니다!`);
             } else {
-                battleLog.push(`🛡️ ${pName}의 방어가 낭비되었습니다.`);
+                battleLog.push(`🛡️ ${pName}의 반사가 낭비되었습니다.`);
             }
         }
         if (eAction === 'block') {
@@ -77,7 +77,7 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
                 enemyDefended = true;
                 battleLog.push(`🛡️ ${eName}이(가) 공격을 반사했습니다!`);
             } else {
-                battleLog.push(`🛡️ ${eName}의 방어가 낭비되었습니다.`);
+                battleLog.push(`🛡️ ${eName}의 반사가 낭비되었습니다.`);
             }
         }
     }
@@ -121,39 +121,45 @@ export const calculateTurn = (state: GameState): Partial<GameState> => {
     let p1WonRound = false;
     let p2WonRound = false;
 
-    if (playerHealth <= 0 && enemyHealth <= 0) {
-        roundEnded = true;
-        playerHealth = 0;
-        enemyHealth = 0;
-    } else if (enemyHealth <= 0) {
-        roundEnded = true;
-        p1WonRound = true;
-        enemyHealth = 0;
-    } else if (playerHealth <= 0) {
-        roundEnded = true;
-        p2WonRound = true;
-        playerHealth = 0;
-    } else if (state.turnCount >= 20) {
-        roundEnded = true;
-        if (playerHealth > enemyHealth) {
+    if (state.gameMode !== 'tutorial') {
+        if (playerHealth <= 0 && enemyHealth <= 0) {
+            roundEnded = true;
+            playerHealth = 0;
+            enemyHealth = 0;
+        } else if (enemyHealth <= 0) {
+            roundEnded = true;
             p1WonRound = true;
-        } else if (enemyHealth > playerHealth) {
+            enemyHealth = 0;
+        } else if (playerHealth <= 0) {
+            roundEnded = true;
             p2WonRound = true;
+            playerHealth = 0;
+        } else if (state.turnCount >= 20) {
+            roundEnded = true;
+            if (playerHealth > enemyHealth) {
+                p1WonRound = true;
+            } else if (enemyHealth > playerHealth) {
+                p2WonRound = true;
+            }
         }
-    }
 
-    if (roundEnded) {
-        if (p1WonRound) p1Wins += 1;
-        if (p2WonRound) p2Wins += 1;
+        if (roundEnded) {
+            if (p1WonRound) p1Wins += 1;
+            if (p2WonRound) p2Wins += 1;
 
-        if (p1Wins >= 2 || p2Wins >= 2 || round >= 3) {
-            roomStatus = 'game_end';
-            if (p1Wins > p2Wins) gameResult = '승리!';
-            else if (p2Wins > p1Wins) gameResult = '패배!';
-            else gameResult = '무승부!';
-        } else {
-            roomStatus = 'round_end';
+            if (p1Wins >= 2 || p2Wins >= 2 || round >= 3) {
+                roomStatus = 'game_end';
+                if (p1Wins > p2Wins) gameResult = '승리!';
+                else if (p2Wins > p1Wins) gameResult = '패배!';
+                else gameResult = '무승부!';
+            } else {
+                roomStatus = 'round_end';
+            }
         }
+    } else {
+        // In tutorial mode, prevent health from dropping below 1 to avoid death
+        if (playerHealth <= 0) playerHealth = 1;
+        if (enemyHealth <= 0) enemyHealth = 1;
     }
 
     let hitEffect: 'player' | 'enemy' | 'both' | null = null;

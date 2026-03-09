@@ -88,28 +88,28 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
     );
   }
 
-  if (state.roomCode && !state.opponentJoined) {
+    if (state.roomCode && !state.opponentJoined) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-zinc-950 text-zinc-100 font-sans">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-zinc-900 rounded-2xl shadow-2xl p-10 w-full max-w-md border border-zinc-800 text-center"
+          className="bg-zinc-900 rounded-2xl shadow-2xl p-6 sm:p-10 w-full max-w-md border border-zinc-800 text-center"
         >
-            <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-6">방 코드</h2>
-            <div className="bg-zinc-950 p-6 rounded-xl text-5xl font-mono font-bold tracking-[0.2em] mb-8 select-all border border-zinc-800/50">
+            <h2 className="text-xs sm:text-sm font-medium text-zinc-500 uppercase tracking-widest mb-4 sm:mb-6">방 코드</h2>
+            <div className="bg-zinc-950 p-4 sm:p-6 rounded-xl text-4xl sm:text-5xl font-mono font-bold tracking-[0.2em] mb-6 sm:mb-8 select-all border border-zinc-800/50">
                 {state.roomCode}
             </div>
-            <div className="flex items-center justify-center gap-3 text-zinc-400 mb-10">
-              <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="flex items-center justify-center gap-2 sm:gap-3 text-zinc-400 mb-8 sm:mb-10 text-sm sm:text-base">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               <span className="ml-2 font-medium">상대방을 기다리는 중...</span>
             </div>
             <button onClick={() => {
                 networkService.leaveRoom(state.roomCode);
                 dispatch({type: 'GO_TO_LOBBY'});
-            }} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors">
+            }} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors text-sm sm:text-base">
                 취소하고 돌아가기
             </button>
         </motion.div>
@@ -122,14 +122,14 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-zinc-900 rounded-2xl shadow-2xl p-8 w-full max-w-lg border border-zinc-800"
+        className="bg-zinc-900 rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-lg border border-zinc-800"
       >
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-zinc-50 tracking-tight flex items-center gap-2">
-              <Gamepad2 className="w-6 h-6 text-zinc-400"/>
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-50 tracking-tight flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400"/>
               PVP 모드
           </h1>
-          <div className={`text-xs font-medium px-3 py-1 rounded-full border ${state.isConnected ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+          <div className={`text-[10px] sm:text-xs font-medium px-2 py-1 sm:px-3 sm:py-1 rounded-full border ${state.isConnected ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
               {state.isConnected ? '서버 연결됨' : '연결 끊김'}
           </div>
         </div>

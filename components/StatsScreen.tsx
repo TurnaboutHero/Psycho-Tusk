@@ -52,52 +52,52 @@ const StatsScreen: React.FC<StatsScreenProps> = ({ dispatch }) => {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-zinc-900 rounded-2xl shadow-2xl p-8 w-full max-w-4xl border border-zinc-800"
+                className="bg-zinc-900 rounded-2xl shadow-2xl p-4 sm:p-8 w-full max-w-4xl border border-zinc-800"
             >
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight text-zinc-50">전적 및 리더보드</h1>
+                <div className="flex justify-between items-center mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-50">전적 및 리더보드</h1>
                     <button 
                         onClick={() => dispatch({ type: 'GO_TO_LOBBY' })} 
-                        className="flex items-center gap-2 text-zinc-400 hover:text-zinc-100 transition-colors"
+                        className="flex items-center gap-1 sm:gap-2 text-zinc-400 hover:text-zinc-100 transition-colors text-sm sm:text-base"
                     >
-                        <ArrowLeft size={20} />
-                        <span>로비로 돌아가기</span>
+                        <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                        <span className="hidden sm:inline">로비로 돌아가기</span>
                     </button>
                 </div>
 
                 {/* Player Stats */}
-                <div className="mb-12">
-                    <h2 className="text-xl font-semibold text-zinc-300 mb-6 flex items-center gap-2">
+                <div className="mb-8 sm:mb-12">
+                    <h2 className="text-lg sm:text-xl font-semibold text-zinc-300 mb-4 sm:mb-6 flex items-center gap-2">
                         <span>나의 전적</span>
-                        <span className="text-sm font-normal text-zinc-500 bg-zinc-800 px-2 py-1 rounded-md">{playerStats.username || 'Guest'}</span>
+                        <span className="text-xs sm:text-sm font-normal text-zinc-500 bg-zinc-800 px-2 py-1 rounded-md">{playerStats.username || 'Guest'}</span>
                     </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div className="bg-zinc-950/50 p-6 rounded-xl border border-zinc-800/50">
-                            <Trophy className="mx-auto mb-3 text-emerald-500" size={28} />
-                            <p className="text-3xl font-bold font-mono">{playerStats.wins}</p>
-                            <p className="text-xs text-zinc-500 uppercase tracking-wider mt-1">승리</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
+                        <div className="bg-zinc-950/50 p-4 sm:p-6 rounded-xl border border-zinc-800/50">
+                            <Trophy className="mx-auto mb-2 sm:mb-3 text-emerald-500 w-6 h-6 sm:w-7 sm:h-7" />
+                            <p className="text-2xl sm:text-3xl font-bold font-mono">{playerStats.wins}</p>
+                            <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mt-1">승리</p>
                         </div>
-                        <div className="bg-zinc-950/50 p-6 rounded-xl border border-zinc-800/50">
-                            <TrendingDown className="mx-auto mb-3 text-red-500" size={28} />
-                            <p className="text-3xl font-bold font-mono">{playerStats.losses}</p>
-                            <p className="text-xs text-zinc-500 uppercase tracking-wider mt-1">패배</p>
+                        <div className="bg-zinc-950/50 p-4 sm:p-6 rounded-xl border border-zinc-800/50">
+                            <TrendingDown className="mx-auto mb-2 sm:mb-3 text-red-500 w-6 h-6 sm:w-7 sm:h-7" />
+                            <p className="text-2xl sm:text-3xl font-bold font-mono">{playerStats.losses}</p>
+                            <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mt-1">패배</p>
                         </div>
-                         <div className="bg-zinc-950/50 p-6 rounded-xl border border-zinc-800/50">
-                            <ChevronsRight className="mx-auto mb-3 text-zinc-500" size={28} />
-                            <p className="text-3xl font-bold font-mono">{playerStats.draws}</p>
-                            <p className="text-xs text-zinc-500 uppercase tracking-wider mt-1">무승부</p>
+                         <div className="bg-zinc-950/50 p-4 sm:p-6 rounded-xl border border-zinc-800/50">
+                            <ChevronsRight className="mx-auto mb-2 sm:mb-3 text-zinc-500 w-6 h-6 sm:w-7 sm:h-7" />
+                            <p className="text-2xl sm:text-3xl font-bold font-mono">{playerStats.draws}</p>
+                            <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mt-1">무승부</p>
                         </div>
-                        <div className="bg-zinc-950/50 p-6 rounded-xl border border-zinc-800/50">
-                            <TrendingUp className="mx-auto mb-3 text-amber-500" size={28} />
-                            <p className="text-3xl font-bold font-mono">{playerStats.rating}</p>
-                            <p className="text-xs text-zinc-500 uppercase tracking-wider mt-1">레이팅</p>
+                        <div className="bg-zinc-950/50 p-4 sm:p-6 rounded-xl border border-zinc-800/50">
+                            <TrendingUp className="mx-auto mb-2 sm:mb-3 text-amber-500 w-6 h-6 sm:w-7 sm:h-7" />
+                            <p className="text-2xl sm:text-3xl font-bold font-mono">{playerStats.rating}</p>
+                            <p className="text-[10px] sm:text-xs text-zinc-500 uppercase tracking-wider mt-1">레이팅</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Leaderboard */}
                 <div>
-                     <h2 className="text-xl font-semibold text-zinc-300 mb-6">글로벌 랭킹 TOP 10</h2>
+                     <h2 className="text-lg sm:text-xl font-semibold text-zinc-300 mb-4 sm:mb-6">글로벌 랭킹 TOP 10</h2>
                      <div className="bg-zinc-950/50 border border-zinc-800/50 rounded-xl overflow-hidden">
                         <table className="w-full text-left">
                             <thead className="bg-zinc-900 border-b border-zinc-800">

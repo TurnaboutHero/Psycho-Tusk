@@ -16,19 +16,19 @@ const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ show, onClose }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative" 
+            className="bg-zinc-900 rounded-2xl p-6 sm:p-8 border border-zinc-800 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative" 
             onClick={(e) => e.stopPropagation()}
           >
             <button 
               onClick={onClose}
-              className="absolute top-6 right-6 text-zinc-500 hover:text-zinc-100 transition-colors"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-zinc-500 hover:text-zinc-100 transition-colors"
             >
-              <X size={24} />
+              <X size={24} className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            <h2 className="text-3xl font-bold mb-8 text-zinc-50 tracking-tight">게임 방법</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-zinc-50 tracking-tight">게임 방법</h2>
             
-            <div className="space-y-8 text-zinc-300">
+            <div className="space-y-6 sm:space-y-8 text-zinc-300 text-sm sm:text-base">
               <section>
                 <h3 className="text-lg font-bold text-zinc-100 mb-3 flex items-center gap-2">
                   <span className="bg-zinc-800 text-zinc-300 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
@@ -45,7 +45,7 @@ const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ show, onClose }) => {
                   기본 규칙
                 </h3>
                 <ul className="list-disc list-inside space-y-2 bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50">
-                  <li>각 플레이어는 <strong className="text-emerald-400">5 HP</strong>, <strong className="text-amber-400">0 총알</strong>, <strong className="text-blue-400">3 방어</strong>로 시작합니다.</li>
+                  <li>각 플레이어는 <strong className="text-emerald-400">5 HP</strong>, <strong className="text-amber-400">0 총알</strong>, <strong className="text-blue-400">3 반사</strong>로 시작합니다.</li>
                   <li>최대 보유 가능한 총알은 5개입니다.</li>
                   <li>각 턴마다 플레이어는 하나의 행동을 선택하며, 행동은 동시에 처리됩니다.</li>
                 </ul>
@@ -82,12 +82,12 @@ const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ show, onClose }) => {
                   <div className="bg-zinc-950/50 p-5 rounded-xl border border-zinc-800/50">
                     <h4 className="font-bold text-lg text-zinc-100 mb-2 flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                      방어 (Block)
+                      반사 (Reflect)
                     </h4>
                     <p className="text-zinc-400">게임 중 총 <strong className="text-blue-400">3회</strong> 사용할 수 있습니다.</p>
-                    <p className="text-zinc-400 mt-1">상대방의 '발사' 공격을 완벽히 막아내어 데미지를 0으로 만듭니다.</p>
+                    <p className="text-zinc-400 mt-1">상대방의 '발사' 공격을 완벽히 막아내고, 그 데미지를 상대방에게 그대로 돌려줍니다.</p>
                     <p className="text-sm text-zinc-500 mt-2 bg-zinc-900 p-2 rounded-lg border border-zinc-800">
-                      ⚠️ 상대방이 공격하지 않아도 방어 횟수는 1회 차감됩니다.
+                      ⚠️ 상대방이 공격하지 않아도 반사 횟수는 1회 차감됩니다.
                     </p>
                   </div>
                 </div>

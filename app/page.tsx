@@ -62,7 +62,7 @@ export default function Home() {
 
   // Turn Cleanup Effect (PVE, Local PVP, Tutorial)
   useEffect(() => {
-    if ((state.gameMode !== 'pve' && state.gameMode !== 'localPvp' && state.gameMode !== 'tutorial') || !state.turnInProgress || state.gameResult) {
+    if ((state.gameMode !== 'pve' && state.gameMode !== 'localPvp' && state.gameMode !== 'tutorial') || !state.turnInProgress) {
       return;
     }
 
@@ -75,7 +75,7 @@ export default function Home() {
     }, 2500); // Delay for animations to play
 
     return () => clearTimeout(timer);
-  }, [state.gameMode, state.turnInProgress, state.gameResult, dispatch]);
+  }, [state.gameMode, state.turnInProgress, dispatch]);
 
   // PVP Network Effect
   useEffect(() => {

@@ -83,28 +83,28 @@ const Lobby: React.FC<LobbyProps> = ({ dispatch }) => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-zinc-900 rounded-2xl shadow-2xl p-8 w-full max-w-md border border-zinc-800"
+          className="bg-zinc-900 rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md border border-zinc-800"
         >
-          <h1 className="text-4xl font-bold text-center mb-2 text-zinc-50 tracking-tighter">심리터스크</h1>
-          <p className="text-center text-zinc-400 mb-8 text-sm">환영합니다, <span className="text-zinc-100 font-bold">{username}</span>님!</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-zinc-50 tracking-tighter">심리터스크</h1>
+          <p className="text-center text-zinc-400 mb-6 sm:mb-8 text-xs sm:text-sm">환영합니다, <span className="text-zinc-100 font-bold">{username}</span>님!</p>
           
           <div className="space-y-3">
-            <button onClick={() => dispatch({ type: 'START_GAME', payload: { mode: 'pve' } })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50">
+            <button onClick={() => dispatch({ type: 'START_GAME', payload: { mode: 'pve' } })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50 text-sm sm:text-base">
               PVE 모드 (AI 대전)
             </button>
-            <button onClick={() => dispatch({ type: 'START_TUTORIAL' })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50">
+            <button onClick={() => dispatch({ type: 'START_TUTORIAL' })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50 text-sm sm:text-base">
               튜토리얼
             </button>
-            <button onClick={() => dispatch({ type: 'START_GAME', payload: { mode: 'localPvp' } })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50">
+            <button onClick={() => dispatch({ type: 'START_GAME', payload: { mode: 'localPvp' } })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50 text-sm sm:text-base">
               로컬 PVP (핫시트)
             </button>
-            <button onClick={() => dispatch({ type: 'SET_MODE', payload: 'pvp' })} className="w-full bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-bold py-3 px-4 rounded-xl transition-colors">
+            <button onClick={() => dispatch({ type: 'SET_MODE', payload: 'pvp' })} className="w-full bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-bold py-3 px-4 rounded-xl transition-colors text-sm sm:text-base">
               PVP 모드 (온라인)
             </button>
-            <button onClick={() => dispatch({ type: 'SHOW_STATS' })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50">
+            <button onClick={() => dispatch({ type: 'SHOW_STATS' })} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700/50 text-sm sm:text-base">
               전적 및 리더보드
             </button>
-            <button onClick={() => setShowHowToPlay(true)} className="w-full bg-zinc-950 hover:bg-zinc-800 text-zinc-400 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-800 mt-4">
+            <button onClick={() => setShowHowToPlay(true)} className="w-full bg-zinc-950 hover:bg-zinc-800 text-zinc-400 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-800 mt-4 text-sm sm:text-base">
               게임 방법
             </button>
           </div>

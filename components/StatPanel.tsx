@@ -6,6 +6,7 @@ interface StatPanelProps {
   health: number;
   bullets: number;
   blockLeft: number;
+  reverse?: boolean;
 }
 
 const StatPanel: React.FC<StatPanelProps> = ({
@@ -13,40 +14,30 @@ const StatPanel: React.FC<StatPanelProps> = ({
   health,
   bullets,
   blockLeft,
+  reverse = false,
 }) => {
   return (
-    <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50 h-full flex flex-col">
-      <h2 className="text-sm font-medium text-zinc-500 mb-6 uppercase tracking-wider">{title}</h2>
-      
-      <div className="space-y-6 flex-grow">
-        {/* Health */}
-        <div className="flex flex-col items-center">
-          <span className="text-xs text-zinc-600 uppercase tracking-wider mb-1">HP</span>
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-red-500" />
-            <span className="text-4xl font-bold text-red-500">{health}</span>
-            <span className="text-zinc-600 text-sm">/ 5</span>
-          </div>
+    <div className={`flex items-center justify-between px-4 py-3 bg-zinc-900/80 backdrop-blur-md border-zinc-800/50 ${reverse ? 'flex-row-reverse border-b' : 'border-t'}`}>
+      <div className={`flex flex-col ${reverse ? 'items-end' : 'items-start'}`}>
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">{title}</span>
+        <div className={`flex items-center gap-1 ${reverse ? 'flex-row-reverse' : ''}`}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Heart 
+              key={i} 
+              className={`w-4 h-4 ${i < health ? 'text-red-500 fill-red-500' : 'text-zinc-800 fill-zinc-900'}`} 
+            />
+          ))}
         </div>
-        
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mt-8">
-            <div className="flex flex-col items-center bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50">
-                <span className="text-xs text-zinc-600 uppercase tracking-wider mb-2">Bullets</span>
-                <div className="flex items-center gap-2">
-                  <Crosshair className="w-4 h-4 text-red-500" />
-                  <span className="text-2xl font-bold text-zinc-100">{bullets}</span>
-                  <span className="text-zinc-600 text-sm">/ 5</span>
-                </div>
-            </div>
-            <div className="flex flex-col items-center bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50">
-                <span className="text-xs text-zinc-600 uppercase tracking-wider mb-2">Blocks</span>
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-500" />
-                  <span className="text-2xl font-bold text-zinc-100">{blockLeft}</span>
-                  <span className="text-zinc-600 text-sm">/ 3</span>
-                </div>
-            </div>
+      </div>
+      
+      <div className={`flex gap-3 ${reverse ? 'flex-row-reverse' : ''}`}>
+        <div className="flex flex-col items-center justify-center bg-zinc-950/50 px-3 py-1.5 rounded-lg border border-zinc-800/50 min-w-[3.5rem]">
+          <Crosshair className="w-4 h-4 text-red-500 mb-0.5" />
+          <span className="text-sm font-bold text-zinc-100 leading-none">{bullets}</span>
+        </div>
+        <div className="flex flex-col items-center justify-center bg-zinc-950/50 px-3 py-1.5 rounded-lg border border-zinc-800/50 min-w-[3.5rem]">
+          <Shield className="w-4 h-4 text-blue-500 mb-0.5" />
+          <span className="text-sm font-bold text-zinc-100 leading-none">{blockLeft}</span>
         </div>
       </div>
     </div>
