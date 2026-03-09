@@ -22,27 +22,27 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ state, dispatch }) =>
           exit={{ opacity: 0, y: -20 }}
           className="fixed inset-x-0 top-12 sm:top-20 z-50 flex justify-center px-2 sm:px-4 pointer-events-none"
         >
-          <div className="bg-zinc-900/95 border border-zinc-700/50 rounded-xl p-2.5 sm:p-4 max-w-lg w-full shadow-2xl pointer-events-auto backdrop-blur-md flex flex-col relative">
+          <div className="bg-zinc-900/95 border border-zinc-700/50 rounded-xl p-3 sm:p-4 max-w-lg w-full shadow-2xl pointer-events-auto backdrop-blur-md flex flex-col relative">
             {!isFinalStep && (
               <button 
                 onClick={() => dispatch({ type: 'GO_TO_LOBBY' })}
-                className="absolute top-2 right-2 p-1 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-colors"
+                className="absolute top-2 right-2 p-1.5 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-colors"
                 title="튜토리얼 건너뛰기"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
             
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
               <div className="bg-blue-500/10 p-1 sm:p-1.5 rounded-full">
-                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                <Info className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-blue-400" />
               </div>
               <div className="text-[10px] sm:text-xs font-bold text-blue-400 tracking-wider">
                 튜토리얼 {tutorialStep < totalSteps ? `${tutorialStep + 1} / ${totalSteps}` : '완료'}
               </div>
             </div>
             
-            <p className="text-zinc-100 text-sm sm:text-base font-medium leading-snug break-keep pr-6">
+            <p className="text-zinc-100 text-xs sm:text-base font-medium leading-relaxed break-keep pr-6">
               {tutorialMessage}
             </p>
             
@@ -56,7 +56,7 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ state, dispatch }) =>
             )}
             
             {!isFinalStep && (
-              <div className="flex gap-1 mt-3">
+              <div className="flex gap-1 mt-2.5 sm:mt-3">
                 {Array.from({ length: totalSteps }).map((_, i) => (
                   <div 
                     key={i} 
