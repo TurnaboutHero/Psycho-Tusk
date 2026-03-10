@@ -107,14 +107,19 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
         <button
           onClick={() => setSelectedAction('load')}
           disabled={isButtonDisabledForTutorial('load')}
-          className={`flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
+          className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
             selectedAction === 'load' 
-              ? 'border-zinc-100 bg-zinc-800 text-zinc-100' 
-              : 'border-zinc-800 hover:border-zinc-600 bg-zinc-950 text-zinc-400'
+              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] scale-[1.02]' 
+              : 'border-zinc-800 hover:border-emerald-500/50 bg-zinc-950 text-emerald-500/70'
           } ${isTutorial && highlightedAction === 'load' ? 'ring-2 ring-yellow-500 animate-pulse' : ''}`}
         >
           <RefreshCw className="w-4 h-4 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
           <span className="font-bold tracking-wider text-[10px] sm:text-xs">장전</span>
+          <div className="absolute top-1 right-1.5 flex gap-0.5">
+            {Array.from({ length: Math.min(bullets, 5) }).map((_, i) => (
+              <div key={i} className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500/50" />
+            ))}
+          </div>
         </button>
         
         <button
@@ -123,45 +128,53 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
           className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
             bullets <= 0 ? 'opacity-50 cursor-not-allowed border-zinc-900 bg-zinc-950 text-zinc-600' :
             selectedAction === 'fire' 
-              ? 'border-red-500 bg-red-500/10 text-red-500' 
+              ? 'border-red-500 bg-red-500/10 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)] scale-[1.02]' 
               : 'border-zinc-800 hover:border-red-500/50 bg-zinc-950 text-red-500/70'
           } ${isTutorial && highlightedAction === 'fire' ? 'ring-2 ring-yellow-500 animate-pulse' : ''}`}
         >
           <Crosshair className="w-4 h-4 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
           <span className="font-bold tracking-wider text-[10px] sm:text-xs">발사 ({bullets})</span>
-          {bullets >= 5 && <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-yellow-500 text-zinc-950 text-[8px] sm:text-xs font-bold px-1 sm:px-2 py-0.5 rounded-full animate-pulse">MAX</span>}
+          {bullets >= 5 && <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-yellow-500 text-zinc-950 text-[8px] sm:text-xs font-bold px-1 sm:px-2 py-0.5 rounded-full animate-pulse shadow-lg">MAX</span>}
         </button>
 
         <button
           onClick={() => setSelectedAction('block')}
           disabled={blockLeft <= 0 || isButtonDisabledForTutorial('block')}
-          className={`flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
+          className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
             blockLeft <= 0 ? 'opacity-50 cursor-not-allowed border-zinc-900 bg-zinc-950 text-zinc-600' :
             selectedAction === 'block' 
-              ? 'border-blue-500 bg-blue-500/10 text-blue-500' 
+              ? 'border-blue-500 bg-blue-500/10 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] scale-[1.02]' 
               : 'border-zinc-800 hover:border-blue-500/50 bg-zinc-950 text-blue-500/70'
           } ${isTutorial && highlightedAction === 'block' ? 'ring-2 ring-yellow-500 animate-pulse' : ''}`}
         >
           <Shield className="w-4 h-4 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
           <span className="font-bold tracking-wider text-[10px] sm:text-xs">반사 ({blockLeft})</span>
+          <div className="absolute top-1 right-1.5 flex gap-0.5">
+            {Array.from({ length: blockLeft }).map((_, i) => (
+              <div key={i} className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500/50" />
+            ))}
+          </div>
         </button>
       </div>
 
       {selectedAction === 'fire' && (
-        <div className="mb-3 sm:mb-6 p-2.5 sm:p-5 bg-zinc-950 rounded-xl border border-zinc-800">
-          <label className="block text-[10px] sm:text-sm font-medium text-zinc-400 mb-2 sm:mb-4 text-center">발사할 총알 개수를 선택하세요</label>
-          <div className="flex justify-center gap-1 sm:gap-2">
+        <div className="mb-3 sm:mb-6 p-3 sm:p-5 bg-zinc-950/80 rounded-xl border border-red-900/30 shadow-[0_0_15px_rgba(239,68,68,0.05)]">
+          <label className="block text-[10px] sm:text-sm font-medium text-red-400/80 mb-2 sm:mb-4 text-center tracking-wide">발사할 총알 개수를 선택하세요</label>
+          <div className="flex justify-center gap-1.5 sm:gap-3">
             {Array.from({ length: bullets }, (_, i) => i + 1).map((num) => (
               <button
                 key={num}
                 onClick={() => setFireAmount(num)}
-                className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl font-bold text-sm sm:text-lg transition-all ${
+                className={`relative w-9 h-9 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl font-bold text-sm sm:text-xl transition-all flex items-center justify-center ${
                   fireAmount === num
-                    ? 'bg-red-500 text-zinc-50 scale-110 shadow-lg shadow-red-500/20'
-                    : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:border-red-500/50 hover:text-red-500'
+                    ? 'bg-red-500 text-white scale-110 shadow-[0_0_20px_rgba(239,68,68,0.4)] border-2 border-red-400'
+                    : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-red-500/50 hover:text-red-400 hover:bg-zinc-800'
                 }`}
               >
                 {num}
+                {fireAmount === num && (
+                  <span className="absolute -bottom-1 w-1 h-1 bg-white rounded-full"></span>
+                )}
               </button>
             ))}
           </div>
@@ -175,9 +188,17 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
           <button
             onClick={submitAction}
             disabled={!selectedAction}
-            className="flex-1 bg-zinc-100 text-zinc-950 font-bold rounded-xl px-3 py-2.5 sm:py-4 hover:bg-zinc-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-xs sm:text-base"
+            className={`flex-1 font-bold rounded-xl px-3 py-2.5 sm:py-4 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-xs sm:text-base ${
+              selectedAction === 'load' ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' :
+              selectedAction === 'fire' ? 'bg-red-500 hover:bg-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]' :
+              selectedAction === 'block' ? 'bg-blue-500 hover:bg-blue-400 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]' :
+              'bg-zinc-800 text-zinc-500'
+            }`}
           >
-            행동 확정
+            {selectedAction === 'load' ? '장전 확정' :
+             selectedAction === 'fire' ? `${fireAmount}발 발사 확정` :
+             selectedAction === 'block' ? '반사 확정' :
+             '행동 선택'}
           </button>
       </div>
     </div>

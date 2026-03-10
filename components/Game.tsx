@@ -113,9 +113,9 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
           </div>
         </div>
       </header>
-      <main className="flex-grow flex flex-col min-h-0 relative">
+      <main className="flex-grow flex flex-col min-h-0 relative overflow-y-auto overflow-x-hidden">
         {/* Enemy Stats (Top) */}
-        <div className="w-full z-10">
+        <div className="w-full z-10 shrink-0">
           <StatPanel
             title={gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : (gameMode === 'localPvp' ? "플레이어 2" : (state.playerId === 'player2' ? "나" : "상대 플레이어"))}
             health={state.enemyHealth}
@@ -126,7 +126,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         </div>
 
         {/* Battlefield (Middle) */}
-        <div className="flex-grow relative flex flex-col">
+        <div className="flex-grow relative flex flex-col min-h-[100px]">
             <Battlefield state={state} />
             {gameMode === 'tutorial' && <TutorialOverlay state={state} dispatch={dispatch} />}
             
@@ -147,7 +147,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         </div>
 
         {/* Player Stats (Bottom) */}
-        <div className="w-full z-10">
+        <div className="w-full z-10 shrink-0">
           <StatPanel
             title={gameMode === 'localPvp' ? "플레이어 1" : (gameMode === 'pvp' ? (state.playerId === 'player1' ? "나" : "상대 플레이어") : "플레이어")}
             health={state.playerHealth}
@@ -157,7 +157,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
           />
         </div>
       </main>
-      <footer className="border-t border-zinc-800">
+      <footer className="border-t border-zinc-800 relative z-20 bg-zinc-950 shrink-0">
         {showActionBar && <ActionBar state={state} dispatch={dispatch} currentPlayer={currentPlayer} />}
         <BattleLog logs={state.battleLog} />
       </footer>

@@ -163,8 +163,8 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     }
 
   return (
-    <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-900/30 p-2 sm:p-4 h-full rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
-      <div className={`relative ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
+    <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-900/30 p-2 sm:p-4 h-full min-h-0 rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
+      <div className={`relative flex items-center justify-center h-full w-full ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
         <EnemyCharacter action={turnInProgress ? displayEnemyAction : 'normal'} />
         {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles />}
         <AnimatePresence>
@@ -209,7 +209,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         )}
       </AnimatePresence>
 
-      <div className={`relative ${displayPlayerDamageTaken && displayPlayerDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'player' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
+      <div className={`relative flex items-center justify-center h-full w-full ${displayPlayerDamageTaken && displayPlayerDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'player' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
         <PlayerCharacter action={turnInProgress ? displayPlayerAction : 'normal'} />
         {(displayShowHitEffect === 'player' || displayShowHitEffect === 'both') && <HitParticles />}
         <AnimatePresence>
