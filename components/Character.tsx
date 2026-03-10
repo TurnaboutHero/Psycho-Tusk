@@ -10,9 +10,16 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
     <svg className="w-24 h-48 sm:w-32 sm:h-64 md:w-[150px] md:h-[300px] max-h-full w-auto" viewBox="0 0 150 300" style={baseStyle}>
       <g className={action === 'hit' ? 'animate-shake' : ''}>
         <g 
-          transform={action === 'attack' ? 'translate(20, 0)' : action === 'heavy-attack' ? 'translate(25, 0) rotate(-2)' : action === 'block' ? 'translate(0, 5)' : 'translate(0, 0)'} 
-          className="transition-all duration-300"
-          style={{ transformOrigin: '75px 250px' }}
+          className={`transition-all duration-300 ${
+            action === 'attack' ? 'animate-player-attack' :
+            action === 'heavy-attack' ? 'animate-player-heavy-attack' :
+            action === 'block' ? 'animate-player-block' :
+            action === 'load' ? 'animate-player-load' : ''
+          }`}
+          style={{ 
+            transformOrigin: '75px 250px',
+            transform: action === 'attack' ? 'translate(20px, 0)' : action === 'heavy-attack' ? 'translate(25px, 0) rotate(-2deg)' : action === 'block' ? 'translate(0, 5px)' : 'translate(0, 0)'
+          }}
         >
           <circle cx="75" cy="50" r="30" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
           <path d="M45 50 Q60 10 75 30 Q90 10 105 50" fill="#2a93d5" stroke="#333" strokeWidth="1" />
@@ -24,10 +31,12 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
             <>
               <path d="M60 90 L30 130 L35 135 L65 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
               <path d="M90 90 L130 120 L125 125 L85 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
-              <g transform="translate(120, 110) rotate(15)">
-                <rect x="0" y="0" width="25" height="10" rx="2" fill="#555" />
-                <rect x="0" y="0" width="15" height="15" rx="2" fill="#333" />
-                <line x1="25" y1="5" x2="40" y2="5" stroke="#ff6b6b" strokeWidth="1" strokeDasharray="2,2" />
+              <g className={action === 'attack' || action === 'heavy-attack' ? 'animate-gun-recoil' : ''} style={{ transformOrigin: '120px 110px' }}>
+                <g transform="translate(120, 110) rotate(15)">
+                  <rect x="0" y="0" width="25" height="10" rx="2" fill="#555" />
+                  <rect x="0" y="0" width="15" height="15" rx="2" fill="#333" />
+                  <line x1="25" y1="5" x2="40" y2="5" stroke="#ff6b6b" strokeWidth="1" strokeDasharray="2,2" />
+                </g>
               </g>
               {action === 'heavy-attack' ? (
                   <g className="muzzle-flash-fx" transform="translate(140, 112) rotate(15)" style={{ transformOrigin: '0 0' }}>
@@ -55,7 +64,7 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
             <>
                <path d="M60 90 L30 120 L35 125 L65 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
                <path d="M90 90 L110 110 L105 115 L85 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
-               <g transform="translate(30, 110) rotate(-10)">
+               <g className={action === 'load' ? 'animate-load-ammo' : ''}>
                   <circle cx="0" cy="0" r="12" fill="#444" stroke="#222" strokeWidth="1.5" />
                   <circle cx="0" cy="-8" r="3" fill="#ffcc00" />
                </g>
@@ -81,9 +90,16 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
     <svg className="w-24 h-48 sm:w-32 sm:h-64 md:w-[150px] md:h-[300px] max-h-full w-auto" viewBox="0 0 150 300" style={baseStyle}>
       <g className={action === 'hit' ? 'animate-shake' : ''}>
         <g 
-          transform={action === 'attack' ? 'translate(-20, 0)' : action === 'heavy-attack' ? 'translate(-25, 0) rotate(2)' : action === 'block' ? 'translate(0, 5)' : 'translate(0, 0)'} 
-          className="transition-all duration-300"
-          style={{ transformOrigin: '75px 250px' }}
+          className={`transition-all duration-300 ${
+            action === 'attack' ? 'animate-enemy-attack' :
+            action === 'heavy-attack' ? 'animate-enemy-heavy-attack' :
+            action === 'block' ? 'animate-enemy-block' :
+            action === 'load' ? 'animate-enemy-load' : ''
+          }`}
+          style={{ 
+            transformOrigin: '75px 250px',
+            transform: action === 'attack' ? 'translate(-20px, 0)' : action === 'heavy-attack' ? 'translate(-25px, 0) rotate(2deg)' : action === 'block' ? 'translate(0, 5px)' : 'translate(0, 0)'
+          }}
         >
           <circle cx="75" cy="50" r="30" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
           <path d="M45 50 Q60 10 75 20 Q90 10 105 50" fill="#7d1a0c" stroke="#333" strokeWidth="1" />
@@ -95,10 +111,12 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
             <>
               <path d="M60 90 L20 120 L25 125 L65 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
               <path d="M90 90 L120 130 L115 135 L85 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
-              <g transform="translate(5, 110) rotate(-15)">
-                <rect x="0" y="0" width="25" height="10" rx="2" fill="#555" />
-                <rect x="15" y="-5" width="15" height="15" rx="2" fill="#333" />
-                <line x1="-15" y1="5" x2="0" y2="5" stroke="#ff6b6b" strokeWidth="1" strokeDasharray="2,2" />
+              <g className={action === 'attack' || action === 'heavy-attack' ? 'animate-enemy-gun-recoil' : ''} style={{ transformOrigin: '5px 110px' }}>
+                <g transform="translate(5, 110) rotate(-15)">
+                  <rect x="0" y="0" width="25" height="10" rx="2" fill="#555" />
+                  <rect x="15" y="-5" width="15" height="15" rx="2" fill="#333" />
+                  <line x1="-15" y1="5" x2="0" y2="5" stroke="#ff6b6b" strokeWidth="1" strokeDasharray="2,2" />
+                </g>
               </g>
               {action === 'heavy-attack' ? (
                 <g className="muzzle-flash-fx" transform="translate(10, 112) rotate(-15)" style={{ transformOrigin: '0 0' }}>
@@ -126,7 +144,7 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
              <>
                <path d="M60 90 L30 120 L35 125 L65 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
                <path d="M90 90 L120 110 L115 115 L85 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
-               <g transform="translate(120, 110) rotate(10)">
+               <g className={action === 'load' ? 'animate-enemy-load-ammo' : ''}>
                    <circle cx="0" cy="0" r="12" fill="#444" stroke="#222" strokeWidth="1.5" />
                    <circle cx="0" cy="-8" r="3" fill="#ffcc00" />
                </g>

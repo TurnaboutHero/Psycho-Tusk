@@ -79,3 +79,117 @@ body {
 .animate-heavy-shake {
   animation: heavy-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
+
+@keyframes player-attack {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(-10px, 0) rotate(2deg); }
+  60% { transform: translate(30px, 0) rotate(-5deg); }
+  100% { transform: translate(20px, 0); }
+}
+.animate-player-attack {
+  animation: player-attack 0.4s ease-out;
+}
+
+@keyframes player-heavy-attack {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(-15px, 0) rotate(5deg); }
+  60% { transform: translate(40px, 0) rotate(-10deg); }
+  100% { transform: translate(25px, 0) rotate(-2deg); }
+}
+.animate-player-heavy-attack {
+  animation: player-heavy-attack 0.5s ease-out;
+}
+
+@keyframes player-block {
+  0% { transform: translate(0, 0); }
+  40% { transform: translate(0, 10px) scale(0.95); }
+  100% { transform: translate(0, 5px); }
+}
+.animate-player-block {
+  animation: player-block 0.4s ease-out;
+}
+
+@keyframes player-load {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(0, -5px) rotate(-3deg); }
+  70% { transform: translate(0, 2px) rotate(2deg); }
+  100% { transform: translate(0, 0); }
+}
+.animate-player-load {
+  animation: player-load 0.5s ease-in-out;
+}
+
+@keyframes enemy-attack {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(10px, 0) rotate(-2deg); }
+  60% { transform: translate(-30px, 0) rotate(5deg); }
+  100% { transform: translate(-20px, 0); }
+}
+.animate-enemy-attack {
+  animation: enemy-attack 0.4s ease-out;
+}
+
+@keyframes enemy-heavy-attack {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(15px, 0) rotate(-5deg); }
+  60% { transform: translate(-40px, 0) rotate(10deg); }
+  100% { transform: translate(-25px, 0) rotate(2deg); }
+}
+.animate-enemy-heavy-attack {
+  animation: enemy-heavy-attack 0.5s ease-out;
+}
+
+@keyframes enemy-block {
+  0% { transform: translate(0, 0); }
+  40% { transform: translate(0, 10px) scale(0.95); }
+  100% { transform: translate(0, 5px); }
+}
+.animate-enemy-block {
+  animation: enemy-block 0.4s ease-out;
+}
+
+@keyframes enemy-load {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(0, -5px) rotate(3deg); }
+  70% { transform: translate(0, 2px) rotate(-2deg); }
+  100% { transform: translate(0, 0); }
+}
+.animate-enemy-load {
+  animation: enemy-load 0.5s ease-in-out;
+}
+
+@keyframes load-ammo {
+  0% { transform: translate(30px, 110px) rotate(-10deg) translateY(-20px); opacity: 0; }
+  50% { transform: translate(30px, 110px) rotate(-10deg) translateY(0); opacity: 1; }
+  100% { transform: translate(30px, 110px) rotate(-10deg) translateY(0); opacity: 1; }
+}
+.animate-load-ammo {
+  animation: load-ammo 0.5s ease-out forwards;
+}
+
+@keyframes enemy-load-ammo {
+  0% { transform: translate(120px, 110px) rotate(10deg) translateY(-20px); opacity: 0; }
+  50% { transform: translate(120px, 110px) rotate(10deg) translateY(0); opacity: 1; }
+  100% { transform: translate(120px, 110px) rotate(10deg) translateY(0); opacity: 1; }
+}
+.animate-enemy-load-ammo {
+  animation: enemy-load-ammo 0.5s ease-out forwards;
+}
+
+@keyframes gun-recoil {
+  0% { transform: rotate(0deg) translateX(0); }
+  20% { transform: rotate(-15deg) translateX(-10px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+.animate-gun-recoil {
+  animation: gun-recoil 0.3s ease-out;
+}
+
+@keyframes enemy-gun-recoil {
+  0% { transform: rotate(0deg) translateX(0); }
+  20% { transform: rotate(15deg) translateX(10px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+.animate-enemy-gun-recoil {
+  animation: enemy-gun-recoil 0.3s ease-out;
+}
