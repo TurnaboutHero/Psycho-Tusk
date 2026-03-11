@@ -80,8 +80,8 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
               <path d="M90 90 L110 140 L105 145 L85 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
             </>
           )}
-          <path d="M70 200 L65 260 L60 260 L60 270 L80 270 L80 260 L75 260 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
-          <path d="M80 200 L85 260 L90 260 L90 270 L70 270 L70 260 L75 260 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
+          <path d="M60 200 L60 260 L55 260 L55 270 L80 270 L80 260 L70 260 L70 200 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
+          <path d="M80 200 L80 260 L75 260 L75 270 L105 270 L105 260 L90 260 L90 200 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
         </g>
       </g>
     </svg>
@@ -165,8 +165,8 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
               <path d="M90 90 L110 140 L105 145 L85 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
             </>
           )}
-          <path d="M70 200 L60 260 L55 260 L55 270 L75 270 L75 260 L70 260 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
-          <path d="M80 200 L90 260 L95 260 L95 270 L75 270 L75 260 L80 260 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
+          <path d="M55 200 L55 260 L45 260 L45 270 L75 270 L75 260 L70 260 L70 200 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
+          <path d="M80 200 L80 260 L70 260 L70 270 L95 270 L95 260 L95 200 Z" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
         </g>
       </g>
     </svg>
