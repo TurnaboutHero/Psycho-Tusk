@@ -92,6 +92,29 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
   const myWins = state.playerId === 'player2' ? state.p2Wins : state.p1Wins;
   const oppWins = state.playerId === 'player2' ? state.p1Wins : state.p2Wins;
 
+  const getTurnIndicatorText = () => {
+    if (state.turnInProgress || state.roomStatus === 'round_end' || state.roomStatus === 'game_end') return null;
+    
+    if (gameMode === 'localPvp') {
+      if (localPvpTurn === 'player1') return '플레이어 1의 턴';
+      if (localPvpTurn === 'player2') return '플레이어 2의 턴';
+      return null;
+    }
+    
+    if (gameMode === 'pvp') {
+      const myActionSet = (state.playerId === 'player1' && !!state.playerAction) || (state.playerId === 'player2' && !!state.enemyAction);
+      return myActionSet ? '상대방 대기 중...' : '당신의 턴';
+    }
+    
+    if (gameMode === 'pve' || gameMode === 'tutorial') {
+      return !!state.playerAction ? '처리 중...' : '당신의 턴';
+    }
+    
+    return null;
+  };
+
+  const turnIndicatorText = getTurnIndicatorText();
+
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col h-screen bg-zinc-950 text-zinc-100 font-sans">
       <header className="p-2 sm:p-4 border-b border-zinc-800 flex justify-between items-center">
@@ -127,6 +150,13 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
 
         {/* Battlefield (Middle) */}
         <div className="flex-grow relative flex flex-col min-h-[100px]">
+            {turnIndicatorText && (
+              <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 z-20 bg-zinc-900/90 border border-zinc-700 px-4 py-1.5 sm:px-6 sm:py-2 rounded-full shadow-lg backdrop-blur-sm pointer-events-none animate-pop-in">
+                <span className={`text-xs sm:text-sm font-bold tracking-wider ${turnIndicatorText.includes('대기') || turnIndicatorText.includes('처리') ? 'text-zinc-400' : 'text-yellow-500'}`}>
+                  {turnIndicatorText}
+                </span>
+              </div>
+            )}
             <Battlefield state={state} />
             {gameMode === 'tutorial' && <TutorialOverlay state={state} dispatch={dispatch} />}
             

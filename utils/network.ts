@@ -33,7 +33,6 @@ class NetworkService {
         if (!this.socket) {
             // Connect to the same host/port the app is running on
             this.socket = io({
-                transports: ['websocket', 'polling'],
                 reconnection: true,
                 reconnectionAttempts: 5,
             });
