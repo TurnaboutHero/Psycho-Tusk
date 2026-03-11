@@ -38,6 +38,16 @@ const HitParticles = () => {
   );
 };
 
+const ReflectedProjectile = ({ direction }: { direction: 'left-to-right' | 'right-to-left' }) => (
+  <motion.div
+    initial={{ x: direction === 'right-to-left' ? 100 : -100, opacity: 1, scaleX: 1 }}
+    animate={{ x: direction === 'right-to-left' ? -200 : 200, opacity: 0, scaleX: 4 }}
+    transition={{ duration: 0.3, ease: "easeIn" }}
+    className="absolute top-1/2 w-16 h-3 bg-yellow-400 rounded-full shadow-[0_0_20px_#facc15] z-20"
+    style={{ y: '-50%' }}
+  />
+);
+
 const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     const { turnInProgress, turnResult, playerAction, enemyAction, showHitEffect, playerEmote, enemyEmote, playerDamageTaken, enemyDamageTaken, gameResult } = state;
 
@@ -83,6 +93,8 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
                                 (enemyAction?.type === 'fire' && playerAction === 'block');
             if (isFireBlock) {
                 AudioController.playBlock();
+                // Play a reflect sound if we had one, for now play hit or block again
+                setTimeout(() => AudioController.playHit(), 100);
             }
         } else if (phase === 'result') {
             if (showHitEffect) AudioController.playHit();
@@ -133,6 +145,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     let displayTurnResult = '';
     let displayPlayerDamageTaken: number | null = null;
     let displayEnemyDamageTaken: number | null = null;
+    let showReflectProjectile: 'left-to-right' | 'right-to-left' | null = null;
 
     if (phase === 'action1') {
         if (playerAction === 'fire' && enemyAction?.type === 'block') {
@@ -148,10 +161,12 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     } else if (phase === 'action2') {
         if (playerAction === 'fire' && enemyAction?.type === 'block') {
             displayPlayerAction = 'normal';
-            displayEnemyAction = getCharacterAction('block', 0, false);
+            displayEnemyAction = 'reflect';
+            showReflectProjectile = 'right-to-left';
         } else if (playerAction === 'block' && enemyAction?.type === 'fire') {
-            displayPlayerAction = getCharacterAction('block', 0, false);
+            displayPlayerAction = 'reflect';
             displayEnemyAction = 'normal';
+            showReflectProjectile = 'left-to-right';
         }
     } else if (phase === 'result') {
         displayShowHitEffect = showHitEffect;
@@ -164,6 +179,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
 
   return (
     <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-900/30 p-2 sm:p-4 h-full min-h-0 rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
+      {showReflectProjectile && <ReflectedProjectile direction={showReflectProjectile} />}
       <div className={`relative flex items-center justify-center h-full w-full ${displayPlayerDamageTaken && displayPlayerDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'player' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-emerald-500/80 uppercase tracking-widest bg-emerald-950/30 border border-emerald-900/50 px-2 py-0.5 rounded-full z-10">
           {state.gameMode === 'localPvp' ? '플레이어 1' : '나의 캐릭터'}

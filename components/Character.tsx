@@ -18,7 +18,7 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
           }`}
           style={{ 
             transformOrigin: '75px 250px',
-            transform: action === 'attack' ? 'translate(20px, 0)' : action === 'heavy-attack' ? 'translate(25px, 0) rotate(-2deg)' : action === 'block' ? 'translate(0, 5px)' : 'translate(0, 0)'
+            transform: action === 'attack' ? 'translate(20px, 0)' : action === 'heavy-attack' ? 'translate(25px, 0) rotate(-2deg)' : action === 'block' ? 'translate(0, 5px)' : action === 'reflect' ? 'translate(15px, 0) rotate(5deg)' : 'translate(0, 0)'
           }}
         >
           <circle cx="75" cy="50" r="30" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
@@ -51,14 +51,19 @@ export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' })
                   </g>
               )}
             </>
-          ) : action === 'block' ? (
+          ) : action === 'block' || action === 'reflect' ? (
             <>
               <path d="M60 90 L40 140 L45 145 L65 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
               <path d="M90 90 L90 150 L95 145 L90 100" fill="#f8d7c9" stroke="#333" strokeWidth="1.5" />
               <g className="shield-up-fx" style={{ transformOrigin: '65px 155px' }}>
-                <rect x="40" y="120" width="50" height="70" rx="5" fill="#6c757d" stroke="#333" strokeWidth="2" />
-                <path d="M45 130 L85 130 L85 180 L45 180 Z" fill="#007bff" fillOpacity="0.3" stroke="#333" strokeWidth="1" />
+                <rect x="40" y="120" width="50" height="70" rx="5" fill={action === 'reflect' ? "#fff" : "#6c757d"} stroke="#333" strokeWidth="2" />
+                <path d="M45 130 L85 130 L85 180 L45 180 Z" fill={action === 'reflect' ? "#ffcc00" : "#007bff"} fillOpacity={action === 'reflect' ? "0.8" : "0.3"} stroke="#333" strokeWidth="1" />
               </g>
+              {action === 'reflect' && (
+                <g className="reflect-shockwave" style={{ transformOrigin: '65px 155px' }}>
+                  <circle cx="65" cy="155" r="50" fill="none" stroke="#ffcc00" strokeWidth="4" className="animate-ping" />
+                </g>
+              )}
             </>
           ) : action === 'load' ? (
             <>
@@ -98,7 +103,7 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
           }`}
           style={{ 
             transformOrigin: '75px 250px',
-            transform: action === 'attack' ? 'translate(-20px, 0)' : action === 'heavy-attack' ? 'translate(-25px, 0) rotate(2deg)' : action === 'block' ? 'translate(0, 5px)' : 'translate(0, 0)'
+            transform: action === 'attack' ? 'translate(-20px, 0)' : action === 'heavy-attack' ? 'translate(-25px, 0) rotate(2deg)' : action === 'block' ? 'translate(0, 5px)' : action === 'reflect' ? 'translate(-15px, 0) rotate(-5deg)' : 'translate(0, 0)'
           }}
         >
           <circle cx="75" cy="50" r="30" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
@@ -131,14 +136,19 @@ export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) 
                 </g>
               )}
             </>
-          ) : action === 'block' ? (
+          ) : action === 'block' || action === 'reflect' ? (
             <>
               <path d="M60 90 L50 140 L55 145 L65 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
               <path d="M90 90 L100 140 L95 145 L85 100" fill="#e3c3b8" stroke="#333" strokeWidth="1.5" />
               <g className="shield-up-fx" style={{ transformOrigin: '85px 155px' }}>
-                <rect x="60" y="120" width="50" height="70" rx="5" fill="#6c757d" stroke="#333" strokeWidth="2" />
-                <path d="M65 130 L105 130 L105 180 L65 180 Z" fill="#dc3545" fillOpacity="0.3" stroke="#333" strokeWidth="1" />
+                <rect x="60" y="120" width="50" height="70" rx="5" fill={action === 'reflect' ? "#fff" : "#6c757d"} stroke="#333" strokeWidth="2" />
+                <path d="M65 130 L105 130 L105 180 L65 180 Z" fill={action === 'reflect' ? "#ffcc00" : "#dc3545"} fillOpacity={action === 'reflect' ? "0.8" : "0.3"} stroke="#333" strokeWidth="1" />
               </g>
+              {action === 'reflect' && (
+                <g className="reflect-shockwave" style={{ transformOrigin: '85px 155px' }}>
+                  <circle cx="85" cy="155" r="50" fill="none" stroke="#ffcc00" strokeWidth="4" className="animate-ping" />
+                </g>
+              )}
             </>
           ) : action === 'load' ? (
              <>
