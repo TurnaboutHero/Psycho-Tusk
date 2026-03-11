@@ -159,18 +159,18 @@ body {
 }
 
 @keyframes load-ammo {
-  0% { transform: translate(30px, 110px) rotate(-10deg) translateY(-20px); opacity: 0; }
-  50% { transform: translate(30px, 110px) rotate(-10deg) translateY(0); opacity: 1; }
-  100% { transform: translate(30px, 110px) rotate(-10deg) translateY(0); opacity: 1; }
+  0% { transform: translate(100px, 130px) rotate(-10deg); opacity: 0; }
+  50% { transform: translate(124px, 108px) rotate(-10deg); opacity: 1; }
+  100% { transform: translate(124px, 108px) rotate(-10deg); opacity: 0; }
 }
 .animate-load-ammo {
   animation: load-ammo 0.5s ease-out forwards;
 }
 
 @keyframes enemy-load-ammo {
-  0% { transform: translate(120px, 110px) rotate(10deg) translateY(-20px); opacity: 0; }
-  50% { transform: translate(120px, 110px) rotate(10deg) translateY(0); opacity: 1; }
-  100% { transform: translate(120px, 110px) rotate(10deg) translateY(0); opacity: 1; }
+  0% { transform: translate(50px, 130px) rotate(10deg); opacity: 0; }
+  50% { transform: translate(26px, 108px) rotate(10deg); opacity: 1; }
+  100% { transform: translate(26px, 108px) rotate(10deg); opacity: 0; }
 }
 .animate-enemy-load-ammo {
   animation: enemy-load-ammo 0.5s ease-out forwards;
@@ -185,11 +185,113 @@ body {
   animation: gun-recoil 0.3s ease-out;
 }
 
-@keyframes enemy-gun-recoil {
-  0% { transform: rotate(0deg) translateX(0); }
-  20% { transform: rotate(15deg) translateX(10px); }
-  100% { transform: rotate(0deg) translateX(0); }
+@keyframes slide-in-left {
+  0% { transform: translateX(-100%) skewX(-10deg); opacity: 0; }
+  100% { transform: translateX(0) skewX(0); opacity: 1; }
 }
-.animate-enemy-gun-recoil {
-  animation: enemy-gun-recoil 0.3s ease-out;
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slide-in-right {
+  0% { transform: translateX(100%) skewX(10deg); opacity: 0; }
+  100% { transform: translateX(0) skewX(0); opacity: 1; }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes zoom-text {
+  0% { transform: scale(3); opacity: 0; }
+  20% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+.animate-zoom-text {
+  animation: zoom-text 1.5s ease-out forwards;
+}
+
+@keyframes top-break-open {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(45deg); }
+  70% { transform: rotate(45deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-top-break {
+  animation: top-break-open 0.6s ease-in-out forwards;
+}
+
+@keyframes top-break-open-enemy {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-45deg); }
+  70% { transform: rotate(-45deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-top-break-enemy {
+  animation: top-break-open-enemy 0.6s ease-in-out forwards;
+}
+
+@keyframes coat-flap {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-coat-flap {
+  animation: coat-flap 0.5s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes hammer-cock {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(-30deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-hammer-cock {
+  animation: hammer-cock 0.2s ease-out forwards;
+}
+
+@keyframes hammer-cock-enemy {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(30deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-hammer-cock-enemy {
+  animation: hammer-cock-enemy 0.2s ease-out forwards;
+}
+
+.font-cinematic {
+  font-family: var(--font-bebas-neue), sans-serif;
+}
+
+@keyframes hit-stop-freeze {
+  0%, 100% { filter: contrast(1.2) brightness(1.1) grayscale(0.3); transform: scale(0.98); }
+}
+.hit-stop {
+  animation: hit-stop-freeze 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes chromatic {
+  0% { text-shadow: 4px 0 0 rgba(255,0,0,0.8), -4px 0 0 rgba(0,255,255,0.8); transform: translateX(-2px); }
+  50% { text-shadow: -4px 0 0 rgba(255,0,0,0.8), 4px 0 0 rgba(0,255,255,0.8); transform: translateX(2px); }
+  100% { text-shadow: 0 0 0 transparent, 0 0 0 transparent; transform: translateX(0); }
+}
+.chromatic-aberration {
+  animation: chromatic 0.2s ease-out;
+}
+
+@keyframes drift {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  20% { opacity: 0.5; }
+  80% { opacity: 0.5; }
+  100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+}
+.dust-mote {
+  animation: drift linear infinite;
 }

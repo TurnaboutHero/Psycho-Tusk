@@ -71,12 +71,23 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
     setShowEmotes(false);
   };
 
+  if (turnInProgress) {
+      return (
+          <motion.div 
+              initial={{ height: 100, opacity: 1 }}
+              animate={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="bg-zinc-950 border-t border-zinc-800 overflow-hidden"
+          />
+      );
+  }
+
   if (isActionDisabled) {
       return (
           <div className="bg-zinc-950 p-6 border-t border-zinc-800 flex flex-col items-center justify-center">
               <div className="text-zinc-500 mb-2">행동 확정됨</div>
               <div className="text-2xl font-bold tracking-widest text-zinc-100 uppercase">
-                  {myActionIsSet ? '대기 중...' : '턴 진행 중...'}
+                  대기 중...
               </div>
               <div className="mt-4 text-sm text-zinc-600 flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 animate-spin" />

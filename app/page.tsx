@@ -10,6 +10,8 @@ import Game from '../components/Game';
 import PvpLobby from '../components/PvpLobby';
 import StatsScreen from '../components/StatsScreen';
 
+import { getTurnDuration } from '../utils/gameUtils';
+
 export default function Home() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
@@ -66,16 +68,18 @@ export default function Home() {
       return;
     }
 
+    const duration = getTurnDuration(state.playerAction || undefined, state.enemyAction?.type || undefined, state.playerFireCount, state.enemyAction?.count || 0);
+
     const timer = setTimeout(() => {
       if (state.gameMode === 'tutorial') {
           dispatch({ type: 'ADVANCE_TUTORIAL' });
       } else {
         dispatch({ type: 'NEXT_TURN' });
       }
-    }, 2500); // Delay for animations to play
+    }, duration);
 
     return () => clearTimeout(timer);
-  }, [state.gameMode, state.turnInProgress, dispatch]);
+  }, [state.gameMode, state.turnInProgress, state.playerAction, state.enemyAction, state.playerFireCount, dispatch]);
 
   // PVP Network Effect
   useEffect(() => {

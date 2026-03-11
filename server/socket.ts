@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { GameState, ActionType } from "../types";
-import { calculateTurn } from "../utils/gameUtils";
+import { calculateTurn, getTurnDuration } from "../utils/gameUtils";
 import { initialState } from "../state/initialState";
 import { DatabaseAdapter } from "./db";
 
@@ -151,6 +151,8 @@ export class SocketManager {
 
         this.io.to(roomCode).emit("ROOM_STATE_UPDATE", resultState);
 
+        const duration = getTurnDuration(room.playerAction || undefined, room.enemyAction?.type || undefined, room.playerFireCount, room.enemyAction?.count || 0);
+
         setTimeout(() => {
             const currentRoomState = this.rooms.get(roomCode);
             if (!currentRoomState) return;
@@ -199,7 +201,7 @@ export class SocketManager {
             this.rooms.set(roomCode, nextTurnState);
             
             this.io.to(roomCode).emit("ROOM_STATE_UPDATE", nextTurnState);
-        }, 2500);
+        }, duration);
     }
 
     private setupSocketEvents() {

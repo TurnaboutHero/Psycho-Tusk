@@ -6,6 +6,33 @@ const actionNameMap: Record<string, string> = {
     'load': '장전'
 };
 
+export const getTurnDuration = (pAction?: string, eAction?: string, pFireCount: number = 0, eFireCount: number = 0): number => {
+    if (!pAction || !eAction) return 2500;
+
+    let duration = 0;
+    const isPlayerHeavy = pAction === 'fire' && pFireCount >= 4;
+    const isEnemyHeavy = eAction === 'fire' && eFireCount >= 4;
+    const hasHeavy = isPlayerHeavy || isEnemyHeavy;
+    
+    const isFireBlock = (pAction === 'fire' && eAction === 'block') || 
+                        (eAction === 'fire' && pAction === 'block');
+
+    // Reveal / Tension phase (new)
+    duration += 500;
+
+    if (hasHeavy) duration += 1200; // cinematic1
+    duration += isFireBlock ? 600 : 800; // action1
+    
+    if (isFireBlock) {
+        duration += 1000; // cinematic2
+        duration += 600; // action2
+    }
+    
+    duration += 1500; // result phase
+    
+    return duration;
+};
+
 export const calculateTurn = (state: GameState): Partial<GameState> => {
     const pAction = state.playerAction;
     const pFireCount = state.playerFireCount;
