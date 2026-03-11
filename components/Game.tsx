@@ -93,27 +93,49 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
   const oppWins = state.playerId === 'player2' ? state.p1Wins : state.p2Wins;
 
   const getTurnIndicatorText = () => {
-    if (state.turnInProgress || state.roomStatus === 'round_end' || state.roomStatus === 'game_end') return null;
+    if (state.roomStatus === 'round_end' || state.roomStatus === 'game_end') return null;
+    
+    if (state.turnInProgress) {
+      return { text: '결과 페이즈: 애니메이션 처리 중...', type: 'processing' };
+    }
     
     if (gameMode === 'localPvp') {
-      if (localPvpTurn === 'player1') return '플레이어 1의 턴';
-      if (localPvpTurn === 'player2') return '플레이어 2의 턴';
+      if (localPvpTurn === 'player1') return { text: '선택 페이즈: 플레이어 1 (하단) 행동 선택', type: 'active' };
+      if (localPvpTurn === 'player2') return { text: '선택 페이즈: 플레이어 2 (상단) 행동 선택', type: 'active' };
       return null;
     }
     
     if (gameMode === 'pvp') {
       const myActionSet = (state.playerId === 'player1' && !!state.playerAction) || (state.playerId === 'player2' && !!state.enemyAction);
-      return myActionSet ? '상대방 대기 중...' : '당신의 턴';
+      return myActionSet ? { text: '대기 페이즈: 상대방의 선택을 기다리는 중...', type: 'waiting' } : { text: '선택 페이즈: 당신의 행동을 선택하세요', type: 'active' };
     }
     
     if (gameMode === 'pve' || gameMode === 'tutorial') {
-      return !!state.playerAction ? '처리 중...' : '당신의 턴';
+      return !!state.playerAction ? { text: '처리 중...', type: 'waiting' } : { text: '선택 페이즈: 당신의 행동을 선택하세요', type: 'active' };
     }
     
     return null;
   };
 
-  const turnIndicatorText = getTurnIndicatorText();
+  const turnIndicator = getTurnIndicatorText();
+
+  // Determine StatPanel props
+  const isLocalPvp = gameMode === 'localPvp';
+  const topTitle = isLocalPvp ? "플레이어 2 (상단)" : (gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : "상대 플레이어");
+  const bottomTitle = isLocalPvp ? "플레이어 1 (하단)" : "나 (플레이어)";
+  
+  const topIsActive = isLocalPvp && localPvpTurn === 'player2' && !state.turnInProgress;
+  const bottomIsActive = isLocalPvp ? (localPvpTurn === 'player1' && !state.turnInProgress) : (!state.turnInProgress && !state.playerAction);
+  
+  const bottomIsMe = !isLocalPvp;
+
+  const [showStartNotice, setShowStartNotice] = useState(true);
+
+  useEffect(() => {
+    if (turnCount > 1 || state.turnInProgress) {
+      setShowStartNotice(false);
+    }
+  }, [turnCount, state.turnInProgress]);
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col h-screen bg-zinc-950 text-zinc-100 font-sans">
@@ -140,23 +162,34 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         {/* Enemy Stats (Top) */}
         <div className="w-full z-10 shrink-0">
           <StatPanel
-            title={gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : (gameMode === 'localPvp' ? "플레이어 2" : (state.playerId === 'player2' ? "나" : "상대 플레이어"))}
+            title={topTitle}
             health={state.enemyHealth}
             bullets={state.enemyBullets}
             blockLeft={state.enemyBlockLeft}
             reverse={true}
+            isActive={topIsActive}
           />
         </div>
 
         {/* Battlefield (Middle) */}
         <div className="flex-grow relative flex flex-col min-h-[100px]">
-            {turnIndicatorText && (
-              <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 z-20 bg-zinc-900/90 border border-zinc-700 px-4 py-1.5 sm:px-6 sm:py-2 rounded-full shadow-lg backdrop-blur-sm pointer-events-none animate-pop-in">
-                <span className={`text-xs sm:text-sm font-bold tracking-wider ${turnIndicatorText.includes('대기') || turnIndicatorText.includes('처리') ? 'text-zinc-400' : 'text-yellow-500'}`}>
-                  {turnIndicatorText}
+            {turnIndicator && (
+              <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 z-20 bg-zinc-900/95 border border-zinc-700 px-4 py-1.5 sm:px-6 sm:py-2 rounded-full shadow-lg backdrop-blur-sm pointer-events-none animate-pop-in flex items-center gap-2">
+                {turnIndicator.type === 'active' && <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />}
+                {turnIndicator.type === 'processing' && <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />}
+                <span className={`text-xs sm:text-sm font-bold tracking-wider ${turnIndicator.type === 'waiting' || turnIndicator.type === 'processing' ? 'text-zinc-400' : 'text-yellow-500'}`}>
+                  {turnIndicator.text}
                 </span>
               </div>
             )}
+            
+            {showStartNotice && turnCount === 1 && !state.turnInProgress && (
+              <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-20 bg-emerald-900/90 border border-emerald-500/50 px-4 py-2 sm:px-6 sm:py-3 rounded-xl shadow-2xl backdrop-blur-sm pointer-events-none animate-pop-in text-center max-w-[90%]">
+                <div className="text-emerald-400 font-bold text-sm sm:text-base mb-1">동시 턴제 심리전</div>
+                <div className="text-emerald-200/80 text-xs sm:text-sm">양쪽 플레이어가 모두 행동을 선택해야 결과가 동시에 처리됩니다.</div>
+              </div>
+            )}
+
             <Battlefield state={state} />
             {gameMode === 'tutorial' && <TutorialOverlay state={state} dispatch={dispatch} />}
             
@@ -179,11 +212,13 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         {/* Player Stats (Bottom) */}
         <div className="w-full z-10 shrink-0">
           <StatPanel
-            title={gameMode === 'localPvp' ? "플레이어 1" : (gameMode === 'pvp' ? (state.playerId === 'player1' ? "나" : "상대 플레이어") : "플레이어")}
+            title={bottomTitle}
             health={state.playerHealth}
             bullets={state.playerBullets}
             blockLeft={state.playerBlockLeft}
             reverse={false}
+            isMe={bottomIsMe}
+            isActive={bottomIsActive}
           />
         </div>
       </main>

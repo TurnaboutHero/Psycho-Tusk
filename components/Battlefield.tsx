@@ -164,52 +164,10 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
 
   return (
     <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-900/30 p-2 sm:p-4 h-full min-h-0 rounded-2xl border border-zinc-800/50 overflow-hidden ${isTransitioning ? 'animate-turn-transition' : ''}`}>
-      <div className={`relative flex items-center justify-center h-full w-full ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
-        <EnemyCharacter action={turnInProgress ? displayEnemyAction : 'normal'} />
-        {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles />}
-        <AnimatePresence>
-          {enemyEmote && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute -bottom-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-zinc-100 text-zinc-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl text-sm sm:text-2xl shadow-2xl z-20 whitespace-nowrap"
-            >
-              {enemyEmote}
-              <div className="absolute -top-2 sm:-bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-zinc-100 rotate-45"></div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {displayEnemyDamageTaken !== null && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20, scale: 0.5 }}
-              animate={{ opacity: 1, y: -40, scale: 1.2 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 text-red-500 text-3xl sm:text-5xl font-black z-30 drop-shadow-lg"
-            >
-              -{displayEnemyDamageTaken}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {turnInProgress && displayTurnResult && (
-          <motion.div 
-            key={state.turnCount}
-            initial={{ opacity: 0, scale: 0.5, y: '-50%', x: '-50%' }}
-            animate={{ opacity: 1, scale: 1, y: '-50%', x: '-50%' }}
-            exit={{ opacity: 0, scale: 1.5, y: '-50%', x: '-50%' }}
-            className="absolute top-1/2 left-1/2 bg-zinc-950/80 px-4 py-2 sm:px-8 sm:py-4 rounded-2xl text-lg sm:text-3xl font-black text-zinc-100 border border-zinc-800 shadow-2xl z-10 backdrop-blur-sm tracking-widest text-center whitespace-nowrap"
-          >
-            {displayTurnResult}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className={`relative flex items-center justify-center h-full w-full ${displayPlayerDamageTaken && displayPlayerDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'player' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-emerald-500/80 uppercase tracking-widest bg-emerald-950/30 border border-emerald-900/50 px-2 py-0.5 rounded-full z-10">
+          {state.gameMode === 'localPvp' ? '플레이어 1' : '나의 캐릭터'}
+        </div>
         <PlayerCharacter action={turnInProgress ? displayPlayerAction : 'normal'} />
         {(displayShowHitEffect === 'player' || displayShowHitEffect === 'both') && <HitParticles />}
         <AnimatePresence>
@@ -235,6 +193,54 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
               className="absolute top-0 left-1/2 -translate-x-1/2 text-red-500 text-3xl sm:text-5xl font-black z-30 drop-shadow-lg"
             >
               -{displayPlayerDamageTaken}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {turnInProgress && displayTurnResult && (
+          <motion.div 
+            key={state.turnCount}
+            initial={{ opacity: 0, scale: 0.5, y: '-50%', x: '-50%' }}
+            animate={{ opacity: 1, scale: 1, y: '-50%', x: '-50%' }}
+            exit={{ opacity: 0, scale: 1.5, y: '-50%', x: '-50%' }}
+            className="absolute top-1/2 left-1/2 bg-zinc-950/80 px-4 py-2 sm:px-8 sm:py-4 rounded-2xl text-lg sm:text-3xl font-black text-zinc-100 border border-zinc-800 shadow-2xl z-10 backdrop-blur-sm tracking-widest text-center whitespace-nowrap"
+          >
+            {displayTurnResult}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className={`relative flex items-center justify-center h-full w-full ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-widest bg-zinc-950/50 px-2 py-0.5 rounded-full z-10">
+          {state.gameMode === 'localPvp' ? '플레이어 2' : '상대방'}
+        </div>
+        <EnemyCharacter action={turnInProgress ? displayEnemyAction : 'normal'} />
+        {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles />}
+        <AnimatePresence>
+          {enemyEmote && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute -bottom-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-zinc-100 text-zinc-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl text-sm sm:text-2xl shadow-2xl z-20 whitespace-nowrap"
+            >
+              {enemyEmote}
+              <div className="absolute -top-2 sm:-bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-zinc-100 rotate-45"></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {displayEnemyDamageTaken !== null && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20, scale: 0.5 }}
+              animate={{ opacity: 1, y: -40, scale: 1.2 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 text-red-500 text-3xl sm:text-5xl font-black z-30 drop-shadow-lg"
+            >
+              -{displayEnemyDamageTaken}
             </motion.div>
           )}
         </AnimatePresence>
