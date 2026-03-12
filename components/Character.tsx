@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import type { CharacterAction } from '../types';
 
 interface CharacterProps {
@@ -48,80 +49,102 @@ const SpaceWesternCharacter = ({ action, theme }: { action: CharacterAction, the
           <path d="M 60 25 L 120 15 L 110 -10 L 70 -5 Z" fill={theme.hat} stroke="#18181b" strokeWidth="2" />
           <path d="M 62 20 L 118 10 L 115 15 L 65 25 Z" fill="#18181b" />
 
-          {/* Arm & Weapon */}
-          {action === 'attack' || action === 'heavy-attack' ? (
-            <g transform="translate(100, 100)">
-              {/* Straight Arm */}
-              <path d="M -20 -10 L 50 -20 L 50 0 L -20 10 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-              {/* Hand/Glove */}
-              <circle cx="50" cy="-10" r="12" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
-              {/* Sci-Fi Handcannon */}
-              <path d="M 40 -30 L 100 -30 L 100 -15 L 60 -15 L 60 10 L 40 10 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
-              {/* Glowing Cylinder */}
-              <circle cx="65" cy="-22" r="6" fill="#18181b" stroke={theme.energy} strokeWidth="1" />
-              <circle cx="65" cy="-22" r="3" fill={theme.energy} style={{ filter: `drop-shadow(0 0 4px ${theme.energy})` }} />
-              {/* Glowing Barrel Accent */}
-              <rect x="75" y="-28" width="20" height="2" fill={theme.energy} />
-
-              {/* Plasma Muzzle Flash */}
-              <path d="M 100 -22 L 150 -35 L 130 -22 L 160 -10 L 130 -10 L 140 5 Z" fill="#fff" style={{ filter: `drop-shadow(0 0 12px ${theme.energy})` }} className="muzzle-flash-fx" />
-              <path d="M 100 -22 L 120 -28 L 115 -22 L 125 -15 L 115 -15 L 120 -5 Z" fill={theme.energy} className="muzzle-flash-fx" />
-            </g>
-          ) : action === 'block' || action === 'reflect' ? (
-            <g transform="translate(80, 100)">
-              {/* Shielding Arm */}
-              <path d="M -10 0 L 30 -50 L 50 -40 L 10 20 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-              {/* Metal Bracer / Gauntlet */}
-              <path d="M 20 -40 L 40 -60 L 55 -45 L 35 -25 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
-              {/* Bracer Energy Core */}
-              <circle cx="38" cy="-42" r="4" fill={theme.energy} style={{ filter: `drop-shadow(0 0 5px ${theme.energy})` }} />
+          {/* Arm & Weapon (Skeletal Animation) */}
+          <g transform="translate(90, 100)">
+            <motion.g
+              initial={false}
+              animate={action}
+              variants={{
+                normal: { rotate: 10 },
+                ready: { rotate: 20 },
+                attack: { rotate: -90 },
+                'heavy-attack': { rotate: -90 },
+                block: { rotate: -30 },
+                reflect: { rotate: -30 },
+                load: { rotate: 10 },
+                hit: { rotate: 30 },
+              }}
+              transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+              transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
+            >
+              {/* Upper Arm */}
+              <path d="M -12 -5 L 12 -5 L 8 40 L -8 40 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
               
-              {/* Hard-Light Energy Shield */}
-              {action === 'reflect' && (
-                <g className="animate-pulse" style={{ transformOrigin: '40px -40px' }}>
-                  {/* Curved Shield Arc */}
-                  <path d="M 20 -90 Q 70 -40 20 10" fill="none" stroke={theme.energy} strokeWidth="6" strokeLinecap="round" style={{ filter: `drop-shadow(0 0 10px ${theme.energy})` }} />
-                  <path d="M 20 -90 Q 70 -40 20 10" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                  {/* Hexagonal Grid Hint */}
-                  <path d="M 35 -65 L 45 -55 L 45 -40" fill="none" stroke={theme.energy} strokeWidth="1" opacity="0.6" />
-                  <path d="M 35 -15 L 45 -25 L 45 -40" fill="none" stroke={theme.energy} strokeWidth="1" opacity="0.6" />
-                </g>
-              )}
-            </g>
-          ) : action === 'load' ? (
-            <g transform="translate(90, 100)">
-              {/* Loading Arm bent upwards */}
-              <path d="M -10 0 L 20 -40 L 40 -30 L 10 10 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-              {/* Hand/Glove */}
-              <circle cx="30" cy="-35" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
-              {/* Broken open gun */}
-              <path d="M 20 -40 L 50 -70 L 60 -60 L 30 -30 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
-              {/* Glowing Plasma Cell being loaded */}
-              <rect x="42" y="-48" width="6" height="10" rx="2" fill="#fff" stroke={theme.energy} strokeWidth="2" style={{ filter: `drop-shadow(0 0 8px ${theme.energy})` }} className="animate-pulse" />
-            </g>
-          ) : action === 'ready' ? (
-            <g transform="translate(90, 100)">
-              {/* Ready Arm bent slightly */}
-              <path d="M -10 0 L 10 30 L 30 20 L -10 10 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-              {/* Hand/Glove */}
-              <circle cx="20" cy="25" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
-              {/* Gun pointing forward but down */}
-              <path d="M 20 20 L 50 40 L 40 50 L 10 30 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
-              {/* Glowing Cylinder Accent */}
-              <circle cx="30" cy="35" r="3" fill={theme.energy} opacity="0.6" />
-            </g>
-          ) : (
-            <g transform="translate(90, 100)">
-              {/* Idle Arm hanging down */}
-              <path d="M -10 0 L 10 60 L -10 70 L -30 10 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-              {/* Hand/Glove */}
-              <circle cx="0" cy="65" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
-              {/* Gun pointing down */}
-              <path d="M 0 60 L 20 110 L 10 120 L -10 70 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
-              {/* Glowing Cylinder Accent */}
-              <circle cx="10" cy="85" r="3" fill={theme.energy} opacity="0.6" />
-            </g>
-          )}
+              {/* Lower Arm Container */}
+              <g transform="translate(0, 35)">
+                <motion.g
+                  initial={false}
+                  animate={action}
+                  variants={{
+                    normal: { rotate: 0 },
+                    ready: { rotate: -70 },
+                    attack: { rotate: 0 },
+                    'heavy-attack': { rotate: 0 },
+                    block: { rotate: -100 },
+                    reflect: { rotate: -100 },
+                    load: { rotate: -120 },
+                    hit: { rotate: -20 },
+                  }}
+                  transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                  transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
+                >
+                  <path d="M -8 -5 L 8 -5 L 6 40 L -6 40 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
+                  
+                  {/* Hand & Weapon Container */}
+                  <g transform="translate(0, 35)">
+                    <motion.g
+                      initial={false}
+                      animate={action}
+                      variants={{
+                        normal: { rotate: 0 },
+                        ready: { rotate: -20 },
+                        attack: { rotate: 0 },
+                        'heavy-attack': { rotate: 0 },
+                        block: { rotate: -30 },
+                        reflect: { rotate: -30 },
+                        load: { rotate: -40 },
+                        hit: { rotate: 0 },
+                      }}
+                      transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                      transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
+                    >
+                      {/* Hand/Glove */}
+                      <circle cx="0" cy="0" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
+                      
+                      {/* Gun */}
+                      <path d="M -12 -5 L 5 -5 L 5 10 L -12 10 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" /> {/* Handle */}
+                      <path d="M -6 -5 L 10 -5 L 10 45 L -6 45 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" /> {/* Barrel */}
+                      <circle cx="2" cy="15" r="5" fill="#18181b" stroke={theme.energy} strokeWidth="1" />
+                      <circle cx="2" cy="15" r="2" fill={theme.energy} style={{ filter: `drop-shadow(0 0 4px ${theme.energy})` }} />
+                      <rect x="-1" y="25" width="6" height="15" fill={theme.energy} />
+
+                      {/* Muzzle Flash */}
+                      {(action === 'attack' || action === 'heavy-attack') && (
+                        <g>
+                          <path d="M 2 45 L -10 95 L 2 75 L 15 105 L 15 75 L 25 85 Z" fill="#fff" style={{ filter: `drop-shadow(0 0 12px ${theme.energy})` }} className="muzzle-flash-fx" />
+                          <path d="M 2 45 L -4 65 L 2 60 L 8 70 L 8 60 L 12 65 Z" fill={theme.energy} className="muzzle-flash-fx" />
+                        </g>
+                      )}
+
+                      {/* Shield */}
+                      {(action === 'block' || action === 'reflect') && (
+                        <g className="animate-pulse">
+                          <path d="M 20 -40 Q 60 0 20 40" fill="none" stroke={theme.energy} strokeWidth="6" strokeLinecap="round" style={{ filter: `drop-shadow(0 0 10px ${theme.energy})` }} />
+                          <path d="M 20 -40 Q 60 0 20 40" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+                          <path d="M 30 -20 L 40 -10 L 40 10" fill="none" stroke={theme.energy} strokeWidth="1" opacity="0.6" />
+                        </g>
+                      )}
+
+                      {/* Loading Plasma Cell */}
+                      {action === 'load' && (
+                        <rect x="-2" y="20" width="8" height="12" rx="2" fill="#fff" stroke={theme.energy} strokeWidth="2" style={{ filter: `drop-shadow(0 0 8px ${theme.energy})` }} className="animate-pulse" />
+                      )}
+                    </motion.g>
+                  </g>
+                </motion.g>
+              </g>
+            </motion.g>
+          </g>
         </g>
       </g>
     </svg>

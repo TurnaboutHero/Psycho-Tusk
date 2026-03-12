@@ -152,7 +152,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
                 timers.push(setTimeout(() => {
                     setPhase('cinematic1');
                     setCinematicData({ type: 'DRAW', player: isPlayerHeavy ? 'player1' : 'player2' });
-                    AudioController.playLoad(); // Dramatic sound
+                    AudioController.playHeavyCharge(); // Dramatic sound
                 }, currentTimer));
                 currentTimer += 1200;
             }
@@ -301,10 +301,15 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         displayEnemyDamageTaken = enemyDamageTaken;
     }
 
+    const isPlayerHeavy = playerAction === 'fire' && state.playerFireCount >= 4;
+    const isEnemyHeavy = enemyAction?.type === 'fire' && (enemyAction?.count ?? 0) >= 4;
+    const hasHeavy = isPlayerHeavy || isEnemyHeavy;
+    const isHeavyFiring = hasHeavy && (phase === 'action1' || phase === 'action2' || phase === 'result');
+
     const isHitStop = phase === 'action2' && (showHitEffect || (playerAction === 'fire' && enemyAction?.type === 'block') || (enemyAction?.type === 'fire' && playerAction === 'block'));
 
   return (
-    <div className={`flex-grow flex flex-row items-center justify-around relative bg-gradient-to-b from-indigo-950 via-purple-950 to-orange-950 p-2 sm:p-4 h-full min-h-0 rounded-2xl border border-zinc-800/80 overflow-hidden shadow-[inset_0_0_100px_rgba(0,0,0,0.8)] ${isTransitioning ? 'animate-turn-transition' : ''} ${isHitStop ? 'hit-stop' : ''}`}>
+    <div className={`flex-grow flex flex-row items-center justify-around relative bg-gradient-to-b from-indigo-950 via-purple-950 to-orange-950 p-2 sm:p-4 h-full min-h-0 rounded-2xl border ${isHeavyFiring ? 'border-red-500 shadow-[inset_0_0_150px_rgba(239,68,68,0.5)]' : 'border-zinc-800/80 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]'} overflow-hidden transition-colors duration-300 ${isTransitioning ? 'animate-turn-transition' : ''} ${isHitStop ? 'hit-stop' : ''}`}>
       <DustMotes />
       
       <AnimatePresence>

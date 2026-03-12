@@ -3,6 +3,7 @@ import { Shield, RefreshCw, Crosshair, MessageCircle } from 'lucide-react';
 import type { GameState, GameAction, ActionType } from '../types';
 import { networkService } from '../utils/network';
 import { motion, AnimatePresence } from 'motion/react';
+import { AudioController } from '../utils/audio';
 
 interface ActionBarProps {
   state: GameState;
@@ -130,7 +131,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
             y: selectedAction === 'load' ? -4 : 0,
             scale: selectedAction === 'load' ? 1.05 : 1
           }}
-          onClick={() => setSelectedAction('load')}
+          onClick={() => { AudioController.playSelect(); setSelectedAction('load'); }}
           disabled={isButtonDisabledForTutorial('load')}
           className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-colors ${
             selectedAction === 'load' 
@@ -159,7 +160,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
             y: selectedAction === 'fire' ? -4 : 0,
             scale: selectedAction === 'fire' ? 1.05 : 1
           }}
-          onClick={() => { setSelectedAction('fire'); setFireAmount(1); }}
+          onClick={() => { AudioController.playSelect(); setSelectedAction('fire'); setFireAmount(1); }}
           disabled={bullets <= 0 || isButtonDisabledForTutorial('fire')}
           className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-colors ${
             bullets <= 0 ? 'opacity-50 cursor-not-allowed border-zinc-900 bg-zinc-950 text-zinc-600' :
@@ -185,7 +186,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
             y: selectedAction === 'block' ? -4 : 0,
             scale: selectedAction === 'block' ? 1.05 : 1
           }}
-          onClick={() => setSelectedAction('block')}
+          onClick={() => { AudioController.playSelect(); setSelectedAction('block'); }}
           disabled={blockLeft <= 0 || isButtonDisabledForTutorial('block')}
           className={`relative flex flex-col items-center justify-center p-1.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-colors ${
             blockLeft <= 0 ? 'opacity-50 cursor-not-allowed border-zinc-900 bg-zinc-950 text-zinc-600' :
@@ -225,7 +226,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
                     key={num}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setFireAmount(num)}
+                    onClick={() => { AudioController.playSelect(); setFireAmount(num); }}
                     className={`relative w-9 h-9 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl font-bold text-sm sm:text-xl transition-colors flex items-center justify-center ${
                       fireAmount === num
                         ? 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] border-2 border-red-400'

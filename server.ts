@@ -37,7 +37,7 @@ async function startServer() {
   app.use("/api", createApiRouter(db));
 
   // Next.js request handler
-  app.use((req, res) => {
+  app.all(/.*/, (req, res) => {
     const parsedUrl = parse(req.url!, true);
     return handle(req, res, parsedUrl);
   });

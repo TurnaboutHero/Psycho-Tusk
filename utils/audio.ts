@@ -41,6 +41,33 @@ export class AudioController {
     osc.stop(this.ctx.currentTime + duration);
   }
 
+  static playSelect() {
+    this.init();
+    // Soft click sound
+    this.playTone(600, 'sine', 0.05, 0.2);
+  }
+
+  static playHeavyCharge() {
+    this.init();
+    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 1.0);
+    
+    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.8, this.ctx.currentTime + 1.0);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.2);
+    
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    
+    osc.start();
+    osc.stop(this.ctx.currentTime + 1.2);
+  }
+
   static playLoad() {
     this.init();
     // High pitched short click
