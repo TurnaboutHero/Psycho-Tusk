@@ -99,6 +99,17 @@ const SpaceWesternCharacter = ({ action, theme }: { action: CharacterAction, the
               {/* Glowing Plasma Cell being loaded */}
               <rect x="42" y="-48" width="6" height="10" rx="2" fill="#fff" stroke={theme.energy} strokeWidth="2" style={{ filter: `drop-shadow(0 0 8px ${theme.energy})` }} className="animate-pulse" />
             </g>
+          ) : action === 'ready' ? (
+            <g transform="translate(90, 100)">
+              {/* Ready Arm bent slightly */}
+              <path d="M -10 0 L 10 30 L 30 20 L -10 10 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
+              {/* Hand/Glove */}
+              <circle cx="20" cy="25" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
+              {/* Gun pointing forward but down */}
+              <path d="M 20 20 L 50 40 L 40 50 L 10 30 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" />
+              {/* Glowing Cylinder Accent */}
+              <circle cx="30" cy="35" r="3" fill={theme.energy} opacity="0.6" />
+            </g>
           ) : (
             <g transform="translate(90, 100)">
               {/* Idle Arm hanging down */}

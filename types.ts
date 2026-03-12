@@ -3,7 +3,7 @@
 export type GameMode = 'lobby' | 'pve' | 'pvp' | 'localPvp' | 'tutorial' | 'stats';
 export type ActionType = 'load' | 'fire' | 'block';
 
-export type CharacterAction = 'normal' | 'hit' | 'attack' | 'heavy-attack' | 'block' | 'load' | 'reflect';
+export type CharacterAction = 'normal' | 'ready' | 'hit' | 'attack' | 'heavy-attack' | 'block' | 'load' | 'reflect';
 
 export interface CharacterProps {
   action?: CharacterAction;

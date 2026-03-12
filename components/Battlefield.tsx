@@ -265,9 +265,12 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     let displayEnemyDamageTaken: number | null = null;
     let showReflectProjectile: 'left-to-right' | 'right-to-left' | null = null;
 
-    if (phase === 'reveal' || phase === 'cinematic1') {
-        displayPlayerAction = 'normal';
-        displayEnemyAction = 'normal';
+    if (phase === 'idle') {
+        displayPlayerAction = playerAction ? 'ready' : 'normal';
+        displayEnemyAction = enemyAction ? 'ready' : 'normal';
+    } else if (phase === 'reveal' || phase === 'cinematic1') {
+        displayPlayerAction = 'ready';
+        displayEnemyAction = 'ready';
     } else if (phase === 'action1' || phase === 'cinematic2') {
         if (playerAction === 'fire' && enemyAction?.type === 'block') {
             displayPlayerAction = getCharacterAction('fire', state.playerFireCount, false);
@@ -324,7 +327,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-orange-500/80 uppercase tracking-widest bg-orange-950/30 border border-orange-900/50 px-2 py-0.5 rounded-full z-10">
           {state.gameMode === 'localPvp' ? '플레이어 1' : '나의 캐릭터'}
         </div>
-        <PlayerCharacter action={turnInProgress ? displayPlayerAction : 'normal'} />
+        <PlayerCharacter action={displayPlayerAction} />
         {(displayShowHitEffect === 'player' || displayShowHitEffect === 'both') && <HitParticles color="bg-red-600" />}
         <AnimatePresence>
           {playerEmote && (
@@ -372,7 +375,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-red-500/80 uppercase tracking-widest bg-red-950/30 border border-red-900/50 px-2 py-0.5 rounded-full z-10">
           {state.gameMode === 'localPvp' ? '플레이어 2' : '상대방'}
         </div>
-        <EnemyCharacter action={turnInProgress ? displayEnemyAction : 'normal'} />
+        <EnemyCharacter action={displayEnemyAction} />
         {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles color="bg-red-500" />}
         <AnimatePresence>
           {enemyEmote && (
