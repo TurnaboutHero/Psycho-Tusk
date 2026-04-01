@@ -3,9 +3,9 @@ import next from "next";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { parse } from "url";
-import { getDatabaseAdapter } from "./server/db";
-import { createApiRouter } from "./server/api";
-import { SocketManager } from "./server/socket";
+import { getDatabaseAdapter } from "./server/db.ts";
+import { createApiRouter } from "./server/api.ts";
+import { SocketManager } from "./server/socket.ts";
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });

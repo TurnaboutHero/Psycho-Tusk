@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "next build",
-    "start": "node server.ts",
+    "start": "NODE_ENV=production node server.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

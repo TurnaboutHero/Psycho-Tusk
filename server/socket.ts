@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { GameState, ActionType } from "../types";
-import { calculateTurn, getTurnDuration } from "../utils/gameUtils";
-import { initialState } from "../state/initialState";
-import { DatabaseAdapter } from "./db";
+import type { GameState, ActionType } from "../types.ts";
+import { calculateTurn, getTurnDuration } from "../utils/gameUtils.ts";
+import { initialState } from "../state/initialState.ts";
+import type { DatabaseAdapter } from "./db.ts";
 
 interface PlayerActionPayload {
     action: ActionType;
