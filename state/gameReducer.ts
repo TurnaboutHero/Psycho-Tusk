@@ -157,9 +157,41 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             opponentJoined: true,
         };
     case 'SYNC_STATE':
+        const newState = action.payload;
+        if (state.playerId === 'player2') {
+            return {
+                ...state,
+                ...newState,
+                playerId: state.playerId,
+                showFireControls: state.showFireControls,
+                
+                // Flip states so player2 always sees themselves as 'player'
+                playerHealth: newState.enemyHealth,
+                enemyHealth: newState.playerHealth,
+                playerBullets: newState.enemyBullets,
+                enemyBullets: newState.playerBullets,
+                playerBlockLeft: newState.enemyBlockLeft,
+                enemyBlockLeft: newState.playerBlockLeft,
+                playerAppearance: newState.enemyAppearance,
+                enemyAppearance: newState.playerAppearance,
+                playerAction: newState.enemyAction?.type || null,
+                enemyAction: newState.playerAction ? { type: newState.playerAction, count: newState.playerFireCount } : null,
+                playerFireCount: newState.enemyAction?.count || 1,
+                
+                // Also flip damage and hit effect
+                playerDamageTaken: newState.enemyDamageTaken,
+                enemyDamageTaken: newState.playerDamageTaken,
+                showHitEffect: newState.showHitEffect === 'player' ? 'enemy' : (newState.showHitEffect === 'enemy' ? 'player' : newState.showHitEffect),
+                
+                // Flip wins
+                p1Wins: newState.p2Wins,
+                p2Wins: newState.p1Wins,
+            };
+        }
+        
         return {
             ...state, // keep local state like playerId
-            ...action.payload,
+            ...newState,
             playerId: state.playerId,
             showFireControls: state.showFireControls, // Preserve local UI state
         };
@@ -168,16 +200,28 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             ...state,
             publicRooms: action.payload,
         };
-    case 'SET_EMOTE':
+    case 'SET_EMOTE': {
+        const targetPlayer = action.payload.player;
+        let localField = targetPlayer === 'player1' ? 'playerEmote' : 'enemyEmote';
+        if (state.playerId === 'player2') {
+            localField = targetPlayer === 'player1' ? 'enemyEmote' : 'playerEmote';
+        }
         return {
             ...state,
-            [action.payload.player === 'player1' ? 'playerEmote' : 'enemyEmote']: action.payload.emote,
+            [localField]: action.payload.emote,
         };
-    case 'CLEAR_EMOTE':
+    }
+    case 'CLEAR_EMOTE': {
+        const targetPlayer = action.payload.player;
+        let localField = targetPlayer === 'player1' ? 'playerEmote' : 'enemyEmote';
+        if (state.playerId === 'player2') {
+            localField = targetPlayer === 'player1' ? 'enemyEmote' : 'playerEmote';
+        }
         return {
             ...state,
-            [action.payload.player === 'player1' ? 'playerEmote' : 'enemyEmote']: null,
+            [localField]: null,
         };
+    }
     case 'CLEAR_DAMAGE_TEXT':
         return {
             ...state,
@@ -194,6 +238,11 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             ...state,
             opponentDisconnected: action.payload.disconnected,
             disconnectTimer: action.payload.timer,
+        };
+    case 'SET_APPEARANCE':
+        return {
+            ...state,
+            [action.payload.player === 'player1' ? 'playerAppearance' : 'enemyAppearance']: action.payload.appearance,
         };
     default:
       return state;

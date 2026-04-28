@@ -87,19 +87,19 @@ class NetworkService {
 
     // --- Public API ---
 
-    public createRoom(isPublic: boolean): Promise<{ roomCode: string; state: GameState }> {
+    public createRoom(isPublic: boolean, appearance: string): Promise<{ roomCode: string; state: GameState }> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('CREATE_ROOM', isPublic, this.sessionId, (roomCode: string, state: GameState) => {
+            this.socket?.emit('CREATE_ROOM', isPublic, this.sessionId, appearance, (roomCode: string, state: GameState) => {
                 resolve({ roomCode, state });
             });
         });
     }
 
-    public joinRoom(roomCode: string): Promise<{ success: boolean; state?: GameState }> {
+    public joinRoom(roomCode: string, appearance: string): Promise<{ success: boolean; state?: GameState }> {
         return new Promise((resolve) => {
             if (!this.socket) this.connect();
-            this.socket?.emit('JOIN_ROOM', roomCode, this.sessionId, (success: boolean, state?: GameState) => {
+            this.socket?.emit('JOIN_ROOM', roomCode, this.sessionId, appearance, (success: boolean, state?: GameState) => {
                 resolve({ success, state });
             });
         });
@@ -114,9 +114,9 @@ class NetworkService {
         });
     }
 
-    public findMatch() {
+    public findMatch(appearance: string) {
         if (!this.socket) this.connect();
-        this.socket?.emit('FIND_MATCH', this.sessionId);
+        this.socket?.emit('FIND_MATCH', this.sessionId, appearance);
     }
 
     public cancelMatch() {

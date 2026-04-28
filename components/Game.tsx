@@ -42,13 +42,8 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
   };
 
   useEffect(() => {
-    if (gameMode === 'pvp') {
-        const unsubscribe = networkService.onStateUpdate((newState) => {
-            dispatch({ type: 'SYNC_STATE', payload: newState });
-        });
-        return () => unsubscribe();
-    }
-  }, [gameMode, dispatch]);
+    // networkService.onStateUpdate is now handled centrally in app/page.tsx
+  }, [gameMode, dispatch, state.playerId]);
 
   const handlePlayAgain = () => {
     if (gameMode === 'pve' || gameMode === 'localPvp') {
@@ -89,9 +84,6 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
 
   const currentPlayer = isPlayer2Turn ? 'player2' : 'player1';
 
-  const myWins = state.playerId === 'player2' ? state.p2Wins : state.p1Wins;
-  const oppWins = state.playerId === 'player2' ? state.p1Wins : state.p2Wins;
-
   const getTurnIndicatorText = () => {
     if (state.roomStatus === 'round_end' || state.roomStatus === 'game_end') return null;
     
@@ -106,7 +98,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
     }
     
     if (gameMode === 'pvp') {
-      const myActionSet = (state.playerId === 'player1' && !!state.playerAction) || (state.playerId === 'player2' && !!state.enemyAction);
+      const myActionSet = !!state.playerAction;
       return myActionSet ? { text: '대기 페이즈: 상대방의 선택을 기다리는 중...', type: 'waiting' } : { text: '선택 페이즈: 당신의 행동을 선택하세요', type: 'active' };
     }
     
@@ -121,6 +113,15 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
 
   // Determine StatPanel props
   const isLocalPvp = gameMode === 'localPvp';
+
+  const myHealth = state.playerHealth;
+  const myBullets = state.playerBullets;
+  const myBlockLeft = state.playerBlockLeft;
+
+  const oppHealth = state.enemyHealth;
+  const oppBullets = state.enemyBullets;
+  const oppBlockLeft = state.enemyBlockLeft;
+
   const topTitle = isLocalPvp ? "플레이어 2 (상단)" : (gameMode === 'pve' || gameMode === 'tutorial' ? "AI 상대" : "상대 플레이어");
   const bottomTitle = isLocalPvp ? "플레이어 1 (하단)" : "나 (플레이어)";
   
@@ -154,7 +155,7 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
           </button>
           <div className="text-right">
             <div className="text-[10px] sm:text-xs text-zinc-500 uppercase">Score</div>
-            <div className="font-mono text-base sm:text-lg leading-none">{myWins} - {oppWins}</div>
+            <div className="font-mono text-base sm:text-lg leading-none">{state.p1Wins} - {state.p2Wins}</div>
           </div>
         </div>
       </header>
@@ -163,9 +164,9 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         <div className="w-full z-10 shrink-0">
           <StatPanel
             title={topTitle}
-            health={state.enemyHealth}
-            bullets={state.enemyBullets}
-            blockLeft={state.enemyBlockLeft}
+            health={oppHealth}
+            bullets={oppBullets}
+            blockLeft={oppBlockLeft}
             reverse={true}
             isActive={topIsActive}
           />
@@ -213,9 +214,9 @@ const Game: React.FC<GameProps> = ({ state, dispatch }) => {
         <div className="w-full z-10 shrink-0">
           <StatPanel
             title={bottomTitle}
-            health={state.playerHealth}
-            bullets={state.playerBullets}
-            blockLeft={state.playerBlockLeft}
+            health={myHealth}
+            bullets={myBullets}
+            blockLeft={myBlockLeft}
             reverse={false}
             isMe={bottomIsMe}
             isActive={bottomIsActive}

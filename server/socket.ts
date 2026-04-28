@@ -16,7 +16,7 @@ export class SocketManager {
     private publicRoomCodes: Set<string>;
     private sessionToRoom: Map<string, { roomCode: string, playerId: 'player1' | 'player2' }>;
     private socketToUser: Map<string, string>;
-    private matchmakingQueue: { socketId: string, userId: string, rating: number, joinTime: number, sessionId: string }[];
+    private matchmakingQueue: { socketId: string, userId: string, rating: number, joinTime: number, sessionId: string, appearance: string }[];
     private matchmakingInterval: NodeJS.Timeout | null = null;
 
     constructor(io: Server, db: DatabaseAdapter) {
@@ -71,7 +71,7 @@ export class SocketManager {
         this.matchmakingQueue = this.matchmakingQueue.filter((_, index) => !matchedIndices.has(index));
     }
 
-    private async createMatch(p1: { socketId: string, userId: string, sessionId: string }, p2: { socketId: string, userId: string, sessionId: string }) {
+    private async createMatch(p1: { socketId: string, userId: string, sessionId: string, appearance: string }, p2: { socketId: string, userId: string, sessionId: string, appearance: string }) {
         const roomCode = `RANKED-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
         
         const newRoomState: GameState = {
@@ -81,6 +81,8 @@ export class SocketManager {
             player1Id: p1.userId,
             player2Id: p2.userId,
             opponentJoined: true,
+            playerAppearance: p1.appearance as any,
+            enemyAppearance: p2.appearance as any,
         };
         this.rooms.set(roomCode, newRoomState);
 
@@ -246,7 +248,7 @@ export class SocketManager {
                 socket.emit("PUBLIC_ROOMS_UPDATE", Array.from(this.publicRoomCodes));
             });
 
-            socket.on("CREATE_ROOM", (isPublic: boolean, sessionId: string, callback: (roomCode: string, state: GameState) => void) => {
+            socket.on("CREATE_ROOM", (isPublic: boolean, sessionId: string, appearance: string, callback: (roomCode: string, state: GameState) => void) => {
                 const roomCode = `PVP-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
                 const userId = this.socketToUser.get(socket.id);
                 
@@ -255,6 +257,7 @@ export class SocketManager {
                     gameMode: 'pvp',
                     roomCode,
                     player1Id: userId,
+                    playerAppearance: appearance as any,
                 };
                 this.rooms.set(roomCode, newRoomState);
 
@@ -271,11 +274,12 @@ export class SocketManager {
                 callback(roomCode, newRoomState);
             });
 
-            socket.on("JOIN_ROOM", (roomCode: string, sessionId: string, callback: (success: boolean, state?: GameState) => void) => {
+            socket.on("JOIN_ROOM", (roomCode: string, sessionId: string, appearance: string, callback: (success: boolean, state?: GameState) => void) => {
                 const room = this.rooms.get(roomCode);
                 if (room && !room.opponentJoined) {
                     room.opponentJoined = true;
                     room.player2Id = this.socketToUser.get(socket.id);
+                    room.enemyAppearance = appearance as any;
                     
                     if (this.publicRoomCodes.has(roomCode)) {
                         this.publicRoomCodes.delete(roomCode);
@@ -365,7 +369,7 @@ export class SocketManager {
                 socket.data.roomCode = null;
             });
 
-            socket.on("FIND_MATCH", async (sessionId: string) => {
+            socket.on("FIND_MATCH", async (sessionId: string, appearance: string) => {
                 const userId = this.socketToUser.get(socket.id);
                 if (!userId) return;
 
@@ -380,7 +384,8 @@ export class SocketManager {
                     userId,
                     rating,
                     joinTime: Date.now(),
-                    sessionId
+                    sessionId,
+                    appearance
                 });
 
                 socket.emit("MATCHMAKING_STARTED");

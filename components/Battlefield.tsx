@@ -16,20 +16,22 @@ function usePrevious<T>(value: T): T | undefined {
     return ref.current;
 }
 
-const DustMotes = () => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden mix-blend-screen opacity-40">
-    {[...Array(30)].map((_, i) => (
-      <div
-        key={i}
-        className="absolute w-1 h-1 bg-amber-500/50 rounded-full dust-mote"
-        style={{
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 10}s`,
-          animationDuration: `${10 + Math.random() * 15}s`,
-        }}
-      />
-    ))}
+const CyberGrid = () => (
+  <div className="absolute inset-0 pointer-events-none perspective-[1000px] flex justify-center items-end overflow-hidden opacity-30">
+    <div className="w-[300%] h-[150%] bg-[linear-gradient(to_right,#3f3f46_1px,transparent_1px),linear-gradient(to_bottom,#3f3f46_1px,transparent_1px)] bg-[size:3rem_3rem] [transform:rotateX(75deg)_translateY(10%)] [mask-image:linear-gradient(to_bottom,transparent_0%,black_100%)]"></div>
+  </div>
+);
+
+const HexagonGrid = () => (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-5">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="hexagons" width="50" height="43.4" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
+          <path d="M25 0 L50 14.4 L50 43.3 L25 57.7 L0 43.3 L0 14.4 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexagons)" className="text-zinc-400" />
+    </svg>
   </div>
 );
 
@@ -38,17 +40,17 @@ const HitParticles = ({ color }: { color: string }) => {
     <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-40">
       {[...Array(15)].map((_, i) => {
         const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 150 + 50;
+        const velocity = Math.random() * 200 + 100;
         const x = Math.cos(angle) * velocity;
         const y = Math.sin(angle) * velocity - 100;
         return (
           <motion.div
             key={i}
             initial={{ x: 0, y: 0, scale: Math.random() * 2 + 0.5, opacity: 1 }}
-            animate={{ x, y: y + 200, scale: 0, opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-            className={`absolute w-2 h-2 ${color} rotate-45`}
-            style={{ filter: `drop-shadow(0 0 10px currentColor)` }}
+            animate={{ x, y: y + 100, scale: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className={`absolute w-1 h-8 ${color} rounded-full`}
+            style={{ filter: `drop-shadow(0 0 10px currentColor)`, transform: `rotate(${angle}rad)` }}
           />
         );
       })}
@@ -56,48 +58,70 @@ const HitParticles = ({ color }: { color: string }) => {
   );
 };
 
-const ReflectedProjectile = ({ direction }: { direction: 'left-to-right' | 'right-to-left' }) => {
-  const color = direction === 'left-to-right' ? 'bg-cyan-400' : 'bg-red-500';
-  const shadow = direction === 'left-to-right' ? 'shadow-[0_0_20px_#22d3ee]' : 'shadow-[0_0_20px_#ef4444]';
+const LaserProjectile = ({ direction, isHeavy }: { direction: 'left-to-right' | 'right-to-left', isHeavy?: boolean }) => {
+  const isLeft = direction === 'left-to-right';
+  const colorClass = isLeft ? 'bg-cyan-400' : 'bg-red-500';
+  const shadowColor = isLeft ? '#22d3ee' : '#ef4444';
   
   return (
     <motion.div
-      initial={{ x: direction === 'right-to-left' ? 100 : -100, opacity: 1, scaleX: 1 }}
-      animate={{ x: direction === 'right-to-left' ? -300 : 300, opacity: 0, scaleX: 6 }}
-      transition={{ duration: 0.2, ease: "easeIn" }}
-      className={`absolute top-1/2 w-24 h-2 ${color} rounded-full ${shadow} z-20`}
-      style={{ y: '-50%' }}
+      initial={{ x: isLeft ? -150 : 150, opacity: 1, scaleX: 1 }}
+      animate={{ x: isLeft ? 150 : -150, opacity: 0, scaleX: isHeavy ? 10 : 5 }}
+      transition={{ duration: 0.1, ease: "linear" }}
+      className={`absolute top-[45%] w-16 ${isHeavy ? 'h-6' : 'h-3'} ${colorClass} rounded-full z-20`}
+      style={{ y: '-50%', filter: `drop-shadow(0 0 ${isHeavy ? '40px' : '20px'} ${shadowColor})`, boxShadow: `0 0 ${isHeavy ? '50px' : '30px'} ${shadowColor}` }}
     >
-      <div className="absolute inset-0 bg-white/80 rounded-full w-1/2 mx-auto" />
+      <div className={`absolute inset-0 ${isHeavy ? 'bg-white' : 'bg-white/90'} rounded-full w-2/3 mx-auto`} />
+    </motion.div>
+  );
+};
+
+const ReflectedProjectile = ({ direction }: { direction: 'left-to-right' | 'right-to-left' }) => {
+  const isLeft = direction === 'left-to-right';
+  const colorClass = isLeft ? 'bg-cyan-400' : 'bg-red-500';
+  const shadowColor = isLeft ? '#22d3ee' : '#ef4444';
+  
+  return (
+    <motion.div
+      initial={{ x: isLeft ? -100 : 100, opacity: 1, scaleX: 1 }}
+      animate={{ x: isLeft ? 300 : -300, opacity: 0, scaleX: 8 }}
+      transition={{ duration: 0.15, ease: "linear" }}
+      className={`absolute top-1/2 w-12 h-3 ${colorClass} rounded-full z-20`}
+      style={{ y: '-50%', filter: `drop-shadow(0 0 20px ${shadowColor})`, boxShadow: `0 0 30px ${shadowColor}` }}
+    >
+      <div className="absolute inset-0 bg-white/90 rounded-full w-2/3 mx-auto" />
     </motion.div>
   );
 };
 
 const CinematicCutin = ({ type, player }: { type: 'DRAW' | 'REFLECT', player: 'player1' | 'player2' }) => {
   const isLeft = player === 'player1';
-  const bgColor = isLeft ? 'bg-cyan-950' : 'bg-red-950';
-  const textColor = isLeft ? 'text-cyan-400' : 'text-red-400';
-  const textShadow = isLeft ? '0 0 30px rgba(34,211,238,0.8)' : '0 0 30px rgba(248,113,113,0.8)';
+  const bgColor = isLeft ? 'bg-blue-900' : 'bg-red-900';
+  const textColor = isLeft ? 'text-blue-200' : 'text-red-200';
+  const textShadow = isLeft ? '0 0 40px rgba(59,130,246,0.8)' : '0 0 40px rgba(239,68,68,0.8)';
+  const label = type === 'DRAW' ? 'SYSTEM OVERRIDE' : 'DEFLECTION MATRIX';
 
   return (
-    <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.8 }} className="absolute inset-0 bg-black" />
+    <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center pointer-events-none">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.9 }} className="absolute inset-0 bg-zinc-950 backdrop-blur-md" />
 
       <motion.div
-        initial={{ x: isLeft ? '-100%' : '100%', skewX: -45 }}
-        animate={{ x: '0%', skewX: -45 }}
-        transition={{ type: "spring", damping: 20, stiffness: 100 }}
-        className={`absolute w-[150%] h-64 ${bgColor} border-y-4 border-white/10 flex items-center justify-center`}
-      />
-
-      <motion.div
-        initial={{ scale: 4, opacity: 0, rotate: isLeft ? -10 : 10 }}
-        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-        transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
-        className={`absolute font-cinematic text-8xl sm:text-[150px] font-black italic tracking-tighter ${textColor} mix-blend-screen`}
-        style={{ textShadow, WebkitTextStroke: '2px white' }}
+        initial={{ x: isLeft ? '-100%' : '100%', skewX: -30 }}
+        animate={{ x: '0%', skewX: -30 }}
+        transition={{ type: "spring", damping: 15, stiffness: 100 }}
+        className={`absolute w-[150%] h-48 sm:h-64 ${bgColor} border-y-8 border-white/20 flex flex-col items-center justify-center`}
       >
-        {type}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.1)_50%,transparent_100%)] w-[200%] animate-scan" style={{ animationDuration: '1s', animationIterationCount: 'infinite' }} />
+      </motion.div>
+
+      <motion.div
+        initial={{ scale: 3, opacity: 0, x: isLeft ? -50 : 50 }}
+        animate={{ scale: 1, opacity: 1, x: 0 }}
+        transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
+        className={`absolute font-mono text-5xl sm:text-7xl font-black italic tracking-widest ${textColor} mix-blend-screen whitespace-nowrap`}
+        style={{ textShadow, WebkitTextStroke: '1px rgba(255,255,255,0.5)' }}
+      >
+        {label}
       </motion.div>
     </div>
   );
@@ -107,14 +131,14 @@ const RevealCutin = () => {
   return (
     <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center pointer-events-none">
       <motion.div
-        initial={{ scale: 0, opacity: 0, rotate: -15 }}
-        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-        exit={{ scale: 2, opacity: 0 }}
-        transition={{ type: "spring", damping: 15, stiffness: 300 }}
-        className="font-cinematic text-9xl font-black italic tracking-tighter text-white mix-blend-overlay"
-        style={{ textShadow: '0 0 40px rgba(255,255,255,0.5)' }}
+        initial={{ scale: 0.5, opacity: 0, letterSpacing: '0px' }}
+        animate={{ scale: 1, opacity: 1, letterSpacing: '20px' }}
+        exit={{ scale: 1.5, opacity: 0, letterSpacing: '40px' }}
+        transition={{ duration: 0.5, ease: "circOut" }}
+        className="font-mono text-7xl sm:text-9xl font-black tracking-[20px] text-zinc-100"
+        style={{ textShadow: '0 0 40px rgba(255,255,255,0.8), 0 0 80px rgba(255,255,255,0.4)', WebkitTextStroke: '2px black' }}
       >
-        VS
+        ENGAGE
       </motion.div>
     </div>
   );
@@ -264,6 +288,7 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     let displayPlayerDamageTaken: number | null = null;
     let displayEnemyDamageTaken: number | null = null;
     let showReflectProjectile: 'left-to-right' | 'right-to-left' | null = null;
+    let showFireProjectile: 'left-to-right' | 'right-to-left' | 'both' | null = null;
 
     if (phase === 'idle') {
         displayPlayerAction = playerAction ? 'ready' : 'normal';
@@ -272,6 +297,14 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         displayPlayerAction = 'ready';
         displayEnemyAction = 'ready';
     } else if (phase === 'action1' || phase === 'cinematic2') {
+        if (playerAction === 'fire' && enemyAction?.type === 'fire') {
+            showFireProjectile = 'both';
+        } else if (playerAction === 'fire') {
+            showFireProjectile = 'left-to-right';
+        } else if (enemyAction?.type === 'fire') {
+            showFireProjectile = 'right-to-left';
+        }
+
         if (playerAction === 'fire' && enemyAction?.type === 'block') {
             displayPlayerAction = getCharacterAction('fire', state.playerFireCount, false);
             displayEnemyAction = 'normal';
@@ -309,8 +342,10 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
     const isHitStop = phase === 'action2' && (showHitEffect || (playerAction === 'fire' && enemyAction?.type === 'block') || (enemyAction?.type === 'fire' && playerAction === 'block'));
 
   return (
-    <div className={`flex-grow flex flex-row items-center justify-around relative bg-gradient-to-b from-indigo-950 via-purple-950 to-orange-950 p-2 sm:p-4 h-full min-h-0 rounded-2xl border ${isHeavyFiring ? 'border-red-500 shadow-[inset_0_0_150px_rgba(239,68,68,0.5)]' : 'border-zinc-800/80 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]'} overflow-hidden transition-colors duration-300 ${isTransitioning ? 'animate-turn-transition' : ''} ${isHitStop ? 'hit-stop' : ''}`}>
-      <DustMotes />
+    <div className={`flex-grow flex flex-row items-center justify-around relative bg-zinc-950 p-2 sm:p-4 h-full min-h-0 rounded-2xl border ${isHeavyFiring ? 'border-red-500 shadow-[inset_0_0_150px_rgba(239,68,68,0.3)]' : 'border-zinc-800 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]'} overflow-hidden transition-colors duration-300 ${isTransitioning ? 'animate-turn-transition' : ''} ${isHitStop ? 'hit-stop' : ''}`}>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-900/50 to-black/80 z-0 pointer-events-none" />
+      <HexagonGrid />
+      <CyberGrid />
       
       <AnimatePresence>
         {isHitStop && (
@@ -327,12 +362,15 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
 
       {cinematicData && <CinematicCutin type={cinematicData.type} player={cinematicData.player} />}
       {showReflectProjectile && <ReflectedProjectile direction={showReflectProjectile} />}
+      {(showFireProjectile === 'left-to-right' || showFireProjectile === 'both') && <LaserProjectile direction="left-to-right" isHeavy={state.playerFireCount >= 4} />}
+      {(showFireProjectile === 'right-to-left' || showFireProjectile === 'both') && <LaserProjectile direction="right-to-left" isHeavy={(enemyAction?.count ?? 0) >= 4} />}
       
       <div className={`relative flex items-center justify-center h-full w-full ${displayPlayerDamageTaken && displayPlayerDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'player' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-orange-500/80 uppercase tracking-widest bg-orange-950/30 border border-orange-900/50 px-2 py-0.5 rounded-full z-10">
-          {state.gameMode === 'localPvp' ? '플레이어 1' : '나의 캐릭터'}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-cyan-400 uppercase tracking-widest bg-zinc-900/80 border border-cyan-900/50 px-4 py-1 rounded shadow-[0_0_10px_rgba(34,211,238,0.2)] z-10 font-mono flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          {state.gameMode === 'localPvp' ? 'PLAYER 1' : 'YOU'}
         </div>
-        <PlayerCharacter action={displayPlayerAction} />
+        <PlayerCharacter action={displayPlayerAction} themeType={state.playerAppearance} />
         {(displayShowHitEffect === 'player' || displayShowHitEffect === 'both') && <HitParticles color="bg-red-600" />}
         <AnimatePresence>
           {playerEmote && (
@@ -350,11 +388,11 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         <AnimatePresence>
           {displayPlayerDamageTaken !== null && (
             <motion.div 
-              initial={{ opacity: 0, y: 20, scale: 0.5 }}
-              animate={{ opacity: 1, y: -40, scale: 1.2 }}
+              initial={{ opacity: 0, y: 50, scale: 0.5 }}
+              animate={{ opacity: 1, y: -20, scale: 1.2 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 text-white text-5xl sm:text-7xl font-cinematic z-30 chromatic-aberration"
+              className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white text-5xl sm:text-7xl font-cinematic z-30 chromatic-aberration"
             >
               -{displayPlayerDamageTaken}
             </motion.div>
@@ -377,10 +415,11 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
       </AnimatePresence>
 
       <div className={`relative flex items-center justify-center h-full w-full ${displayEnemyDamageTaken && displayEnemyDamageTaken >= 3 ? 'animate-heavy-shake' : (displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') ? 'animate-shake' : ''}`}>
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-red-500/80 uppercase tracking-widest bg-red-950/30 border border-red-900/50 px-2 py-0.5 rounded-full z-10">
-          {state.gameMode === 'localPvp' ? '플레이어 2' : '상대방'}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-red-500 uppercase tracking-widest bg-zinc-900/80 border border-red-900/50 px-4 py-1 rounded shadow-[0_0_10px_rgba(239,68,68,0.2)] z-10 font-mono flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          {state.gameMode === 'localPvp' ? 'PLAYER 2' : 'ENEMY'}
         </div>
-        <EnemyCharacter action={displayEnemyAction} />
+        <EnemyCharacter action={displayEnemyAction} themeType={state.enemyAppearance} />
         {(displayShowHitEffect === 'enemy' || displayShowHitEffect === 'both') && <HitParticles color="bg-red-500" />}
         <AnimatePresence>
           {enemyEmote && (
@@ -398,11 +437,11 @@ const Battlefield: React.FC<BattlefieldProps> = ({ state }) => {
         <AnimatePresence>
           {displayEnemyDamageTaken !== null && (
             <motion.div 
-              initial={{ opacity: 0, y: 20, scale: 0.5 }}
-              animate={{ opacity: 1, y: -40, scale: 1.2 }}
+              initial={{ opacity: 0, y: 50, scale: 0.5 }}
+              animate={{ opacity: 1, y: -20, scale: 1.2 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="absolute top-0 left-1/2 -translate-x-1/2 text-white text-5xl sm:text-7xl font-cinematic z-30 chromatic-aberration"
+              className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white text-5xl sm:text-7xl font-cinematic z-30 chromatic-aberration"
             >
               -{displayEnemyDamageTaken}
             </motion.div>

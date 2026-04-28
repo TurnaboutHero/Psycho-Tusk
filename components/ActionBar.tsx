@@ -14,7 +14,7 @@ interface ActionBarProps {
 const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 'player1' }) => {
   const { gameMode, turnInProgress, playerAction, enemyAction, roomCode, playerId, highlightedAction } = state;
 
-  const isPlayer2 = (gameMode === 'localPvp' && currentPlayer === 'player2') || (gameMode === 'pvp' && playerId === 'player2');
+  const isPlayer2 = gameMode === 'localPvp' && currentPlayer === 'player2';
   const isTutorial = gameMode === 'tutorial';
 
   // Determine which player's stats to use
@@ -29,7 +29,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ state, dispatch, currentPlayer = 
   // Disable controls if the turn is processing, OR if this specific player has already made their move.
   let myActionIsSet = false;
   if (gameMode === 'pvp') {
-    myActionIsSet = (playerId === 'player1' && !!playerAction) || (playerId === 'player2' && !!enemyAction);
+    myActionIsSet = !!playerAction; // Since state is flipped for player2, my action is always playerAction
   } else if (gameMode === 'localPvp') {
     myActionIsSet = (isPlayer2 && !!enemyAction) || (!isPlayer2 && !!playerAction);
   } else { // PVE or Tutorial

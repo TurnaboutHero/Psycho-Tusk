@@ -1,182 +1,285 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import type { CharacterAction } from '../types';
+import type { CharacterAction, CharacterTheme } from '../types';
 
 interface CharacterProps {
   action?: CharacterAction;
+  themeType?: CharacterTheme;
 }
 
 interface ThemeColors {
-  coat: string;
-  coatDark: string;
-  hat: string;
-  pants: string;
-  skin: string;
+  primary: string;
+  secondary: string;
+  armor: string;
+  armorDark: string;
   energy: string;
+  energyGlow: string;
   metal: string;
 }
 
-const SpaceWesternCharacter = ({ action, theme }: { action: CharacterAction, theme: ThemeColors }) => {
+export const themes: Record<CharacterTheme, ThemeColors> = {
+  blue: {
+    primary: '#2563eb', // blue-600
+    secondary: '#1e3a8a', // blue-900
+    armor: '#e2e8f0', // slate-200
+    armorDark: '#94a3b8', // slate-400
+    energy: '#06b6d4', // cyan-500
+    energyGlow: 'rgba(6, 182, 212, 0.6)',
+    metal: '#334155', // slate-700
+  },
+  red: {
+    primary: '#dc2626', // red-600
+    secondary: '#7f1d1d', // red-900
+    armor: '#27272a', // zinc-800
+    armorDark: '#18181b', // zinc-900
+    energy: '#ef4444', // red-500
+    energyGlow: 'rgba(239, 68, 68, 0.6)',
+    metal: '#71717a', // zinc-500
+  },
+  cyber: {
+    primary: '#c026d3', // fuchsia-600
+    secondary: '#4a044e', // fuchsia-950
+    armor: '#171717', // neutral-900
+    armorDark: '#0a0a0a', // neutral-950
+    energy: '#2dd4bf', // teal-400
+    energyGlow: 'rgba(45, 212, 191, 0.6)',
+    metal: '#a8a29e', // stone-400
+  },
+  desert: {
+    primary: '#d97706', // amber-500
+    secondary: '#78350f', // amber-900
+    armor: '#fde68a', // amber-200
+    armorDark: '#d97706', // amber-500
+    energy: '#fbbf24', // amber-400
+    energyGlow: 'rgba(251, 191, 36, 0.6)',
+    metal: '#78716c', // stone-500
+  },
+  shadow: {
+    primary: '#09090b', // zinc-950
+    secondary: '#000000', // black
+    armor: '#27272a', // zinc-800
+    armorDark: '#09090b', // zinc-950
+    energy: '#22c55e', // green-500
+    energyGlow: 'rgba(34, 197, 94, 0.6)',
+    metal: '#52525b', // zinc-600
+  }
+};
+
+const TuskMech = ({ action, theme }: { action: CharacterAction, theme: ThemeColors }) => {
   return (
     <svg viewBox="0 0 200 300" className="w-24 h-48 sm:w-32 sm:h-64 md:w-[200px] md:h-[300px] max-h-full w-auto drop-shadow-2xl overflow-visible">
+      <defs>
+        <linearGradient id="armorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={theme.armor} />
+          <stop offset="100%" stopColor={theme.armorDark} />
+        </linearGradient>
+        <filter id="energyGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="8" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+
       <g className={action === 'hit' ? 'animate-shake' : ''}>
-        <g className="transition-transform duration-200 ease-out" style={{ transformOrigin: '100px 250px', transform: action === 'attack' ? 'translate(20px, 0)' : action === 'heavy-attack' ? 'translate(30px, 0) rotate(-5deg)' : action === 'block' ? 'translate(-10px, 10px)' : action === 'reflect' ? 'translate(10px, 0) rotate(5deg)' : 'translate(0, 0)' }}>
+        <motion.g 
+          initial={false}
+          style={{ transformOrigin: '100px 250px', transformBox: 'view-box' }}
+          animate={{
+            x: action === 'attack' ? 20 : action === 'heavy-attack' ? 40 : action === 'block' ? -10 : action === 'reflect' ? 10 : action === 'load' ? -5 : 0,
+            y: action === 'block' ? 10 : action === 'load' ? -15 : 0,
+            rotate: action === 'heavy-attack' ? 5 : action === 'reflect' ? -5 : action === 'load' ? -10 : 0,
+          }}
+          transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+        >
+          
+          {/* Base Shadow */}
+          <ellipse cx="100" cy="285" rx="55" ry="12" fill="black" opacity="0.4" />
 
-          {/* Back Leg */}
-          <path d="M 110 200 L 130 300 L 100 300 L 90 200 Z" fill={theme.pants} stroke="#18181b" strokeWidth="2" />
-          {/* Front Leg (Cybernetic/Armored hint) */}
-          <path d="M 70 200 L 60 300 L 90 300 L 100 200 Z" fill={theme.metal} stroke="#09090b" strokeWidth="2" />
-          <path d="M 65 250 L 95 250" stroke={theme.energy} strokeWidth="2" opacity="0.3" />
+          {/* BACK ARM (Static) */}
+          <g transform="translate(120, 110)">
+            <path d="M 0 0 L 25 50 L 15 55 L -10 5 Z" fill={theme.metal} />
+            <circle cx="20" cy="52" r="12" fill={theme.secondary} />
+            <circle cx="20" cy="52" r="6" fill={theme.armor} />
+          </g>
 
-          {/* Coat Back Flap */}
-          <path d="M 100 150 L 160 250 L 110 220 L 80 260 Z" fill={theme.coatDark} stroke="#18181b" strokeWidth="2" />
+          {/* BACK LEG */}
+          <g transform="translate(125, 185)">
+             {/* Thigh */}
+             <path d="M -10 -15 L 15 -15 L 20 45 L -15 40 Z" fill={theme.secondary} />
+             {/* Calf */}
+             <path d="M -10 35 L 20 40 L 25 90 L -5 95 Z" fill={theme.metal} />
+             {/* Foot */}
+             <path d="M -15 90 L 35 90 L 40 100 L -25 100 Z" fill={theme.primary} />
+             {/* Joint */}
+             <circle cx="5" cy="40" r="10" fill={theme.secondary} />
+          </g>
 
-          {/* Torso & Main Coat */}
-          <path d="M 60 60 L 120 70 L 140 150 L 100 200 L 60 180 L 40 100 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
+          {/* FRONT LEG */}
+          <g transform="translate(75, 185)">
+             {/* Thigh */}
+             <path d="M -20 -10 L 20 -15 L 15 50 L -20 45 Z" fill={theme.primary} />
+             <path d="M -15 -10 L 15 -15 L 10 50 L -15 45 Z" fill="url(#armorGradient)" opacity="0.6"/>
+             {/* Calf */}
+             <path d="M -20 40 L 15 45 L 20 95 L -25 95 Z" fill={theme.armor} />
+             {/* Foot */}
+             <path d="M -40 90 L 30 90 L 35 100 L -50 100 Z" fill={theme.secondary} />
+             {/* Joint */}
+             <circle cx="-2" cy="45" r="14" fill={theme.primary} />
+             <circle cx="-2" cy="45" r="6" fill={theme.metal} />
+          </g>
+          
+          {/* CORE TORSO */}
+          <g transform="translate(100, 135)">
+            <path d="M -35 -45 L 35 -45 L 45 10 L 25 55 L -25 55 L -45 10 Z" fill="url(#armorGradient)" />
+            <path d="M -25 -45 L 25 -45 L 35 10 L 15 55 L -15 55 L -35 10 Z" fill="white" opacity="0.1" />
+            
+            {/* Core Reactor */}
+            <circle cx="0" cy="5" r="22" fill={theme.metal} />
+            <motion.circle 
+              cx="0" cy="5" r="14" 
+              fill={theme.energy} 
+              filter="url(#energyGlow)" 
+              initial={{ scale: 0.9, opacity: 0.8 }}
+              animate={{ scale: action === 'load' ? 1.2 : 1, opacity: action === 'load' ? 1 : 0.8 }}
+              transition={{ repeat: action === 'load' ? Infinity : 0, duration: 0.5, repeatType: 'reverse' }}
+            />
+            {/* Chest Plates */}
+            <path d="M -40 -20 L 0 -5 L 40 -20" fill="none" stroke={theme.metal} strokeWidth="6" opacity="0.5" />
+            <path d="M -45 10 L 0 5 L 45 10" fill="none" stroke={theme.metal} strokeWidth="6" opacity="0.5" />
+          </g>
 
-          {/* Scarf / Bandana */}
-          <path d="M 50 60 L 110 50 L 120 80 L 90 90 Z" fill="#3f3f46" stroke="#18181b" strokeWidth="2" />
+          {/* HEAD & TUSKS */}
+          <g transform="translate(100, 75)">
+             {/* Neck */}
+             <rect x="-15" y="10" width="30" height="25" fill={theme.metal} />
+             
+             {/* Head Base */}
+             <path d="M -28 -25 L 28 -25 L 35 12 L 0 32 L -35 12 Z" fill={theme.primary} />
+             <path d="M -22 -20 L 22 -20 L 28 10 L 0 25 L -28 10 Z" fill={theme.secondary} />
+             
+             {/* Glowing Eye Visor */}
+             <motion.path 
+               d="M -20 -5 L 20 -5 L 25 10 L 0 18 L -25 10 Z" 
+               fill={theme.energy} 
+               filter="url(#energyGlow)"
+               animate={{ opacity: action === 'hit' ? 0.3 : 1 }}
+             />
+             <path d="M -10 8 L 10 2" fill="none" stroke="#fff" strokeWidth="2" opacity="0.6" />
+             
+             {/* TUSKS */}
+             {/* Left Tusk */}
+             <path d="M -30 15 Q -50 -10 -65 -40" fill="none" stroke="url(#armorGradient)" strokeWidth="12" strokeLinecap="round" />
+             <path d="M -30 15 Q -50 -10 -65 -40" fill="none" stroke={theme.metal} strokeWidth="6" strokeLinecap="round" />
+             {/* Right Tusk */}
+             <path d="M 30 15 Q 50 -10 65 -40" fill="none" stroke="url(#armorGradient)" strokeWidth="12" strokeLinecap="round" />
+             <path d="M 30 15 Q 50 -10 65 -40" fill="none" stroke={theme.metal} strokeWidth="6" strokeLinecap="round" />
+          </g>
 
-          {/* Face (Shadowed) */}
-          <path d="M 70 30 L 110 20 L 120 60 L 60 60 Z" fill={theme.skin} stroke="#18181b" strokeWidth="2" />
-          {/* Deep shadow over eyes from hat */}
-          <path d="M 65 30 L 115 20 L 118 45 L 62 45 Z" fill="#09090b" opacity="0.8" />
-          {/* Glowing Cyber-Eye under hat */}
-          <circle cx="95" cy="40" r="3" fill={theme.energy} style={{ filter: `drop-shadow(0 0 4px ${theme.energy})` }} />
-
-          {/* Head/Hat (Classic Stetson) */}
-          <path d="M 20 40 L 100 20 L 160 40 L 100 50 Z" fill={theme.hat} stroke="#18181b" strokeWidth="2" />
-          <path d="M 60 25 L 120 15 L 110 -10 L 70 -5 Z" fill={theme.hat} stroke="#18181b" strokeWidth="2" />
-          <path d="M 62 20 L 118 10 L 115 15 L 65 25 Z" fill="#18181b" />
-
-          {/* Arm & Weapon (Skeletal Animation) */}
-          <g transform="translate(90, 100)">
+          {/* FRONT ARM (Tank Cannon) */}
+          <g transform="translate(80, 110)">
             <motion.g
               initial={false}
               animate={action}
+              style={{ transformOrigin: '50% 50%' }}
               variants={{
-                normal: { rotate: 10 },
-                ready: { rotate: 20 },
+                normal: { rotate: 0 },
+                ready: { rotate: -45 },
                 attack: { rotate: -90 },
                 'heavy-attack': { rotate: -90 },
-                block: { rotate: -30 },
-                reflect: { rotate: -30 },
-                load: { rotate: 10 },
-                hit: { rotate: 30 },
+                block: { rotate: -20 },
+                reflect: { rotate: -80 },
+                load: { rotate: -110 },
+                hit: { rotate: 40 },
               }}
-              transition={{ type: 'spring', stiffness: 250, damping: 25 }}
-              transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
+              transition={{ type: 'spring', stiffness: 150, damping: 15 }}
             >
-              {/* Upper Arm */}
-              <path d="M -12 -5 L 12 -5 L 8 40 L -8 40 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
+              {/* Invisible bounding box normalizer to make 50% 50% equal (0,0) */}
+              <circle cx="0" cy="0" r="200" fill="transparent" pointerEvents="none" />
               
-              {/* Lower Arm Container */}
-              <g transform="translate(0, 35)">
-                <motion.g
-                  initial={false}
-                  animate={action}
-                  variants={{
-                    normal: { rotate: 0 },
-                    ready: { rotate: -70 },
-                    attack: { rotate: 0 },
-                    'heavy-attack': { rotate: 0 },
-                    block: { rotate: -100 },
-                    reflect: { rotate: -100 },
-                    load: { rotate: -120 },
-                    hit: { rotate: -20 },
-                  }}
-                  transition={{ type: 'spring', stiffness: 250, damping: 25 }}
-                  transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
+              {/* Cannon Base (Shoulder) */}
+              <circle cx="0" cy="0" r="30" fill={theme.primary} />
+              <circle cx="0" cy="0" r="18" fill="url(#armorGradient)" />
+              <circle cx="0" cy="0" r="8" fill={theme.metal} />
+              
+              {/* Cannon Barrel */}
+              <path d="M -20 20 L 20 20 L 15 80 L -15 80 Z" fill={theme.secondary} />
+              <path d="M -15 80 L 15 80 L 10 100 L -10 100 Z" fill={theme.metal} />
+              <rect x="-10" y="25" width="20" height="40" fill="url(#armorGradient)" />
+              
+              {/* Blaster Core */}
+              <rect x="-4" y="60" width="8" height="30" fill={theme.energy} opacity="0.8" />
+              
+              {/* Energy Muzzle Flash */}
+              {(action === 'attack' || action === 'heavy-attack') && (
+                <motion.g 
+                  initial={{ scale: 0.5, opacity: 1 }} 
+                  animate={{ scale: action === 'heavy-attack' ? [2.5, 0] : [1.5, 0], opacity: [1, 0] }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <path d="M -8 -5 L 8 -5 L 6 40 L -6 40 Z" fill={theme.coat} stroke="#18181b" strokeWidth="2" />
-                  
-                  {/* Hand & Weapon Container */}
-                  <g transform="translate(0, 35)">
-                    <motion.g
-                      initial={false}
-                      animate={action}
-                      variants={{
-                        normal: { rotate: 0 },
-                        ready: { rotate: -20 },
-                        attack: { rotate: 0 },
-                        'heavy-attack': { rotate: 0 },
-                        block: { rotate: -30 },
-                        reflect: { rotate: -30 },
-                        load: { rotate: -40 },
-                        hit: { rotate: 0 },
-                      }}
-                      transition={{ type: 'spring', stiffness: 250, damping: 25 }}
-                      transformTemplate={(_, g) => `rotate(${(g || '').match(/rotate[Z]?\(([-.\d]+)/)?.[1] || 0} 0 0)`}
-                    >
-                      {/* Hand/Glove */}
-                      <circle cx="0" cy="0" r="10" fill={theme.metal} stroke="#18181b" strokeWidth="2" />
-                      
-                      {/* Gun */}
-                      <path d="M -12 -5 L 5 -5 L 5 10 L -12 10 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" /> {/* Handle */}
-                      <path d="M -6 -5 L 10 -5 L 10 45 L -6 45 Z" fill={theme.metal} stroke="#27272a" strokeWidth="2" /> {/* Barrel */}
-                      <circle cx="2" cy="15" r="5" fill="#18181b" stroke={theme.energy} strokeWidth="1" />
-                      <circle cx="2" cy="15" r="2" fill={theme.energy} style={{ filter: `drop-shadow(0 0 4px ${theme.energy})` }} />
-                      <rect x="-1" y="25" width="6" height="15" fill={theme.energy} />
-
-                      {/* Muzzle Flash */}
-                      {(action === 'attack' || action === 'heavy-attack') && (
-                        <g>
-                          <path d="M 2 45 L -10 95 L 2 75 L 15 105 L 15 75 L 25 85 Z" fill="#fff" style={{ filter: `drop-shadow(0 0 12px ${theme.energy})` }} className="muzzle-flash-fx" />
-                          <path d="M 2 45 L -4 65 L 2 60 L 8 70 L 8 60 L 12 65 Z" fill={theme.energy} className="muzzle-flash-fx" />
-                        </g>
-                      )}
-
-                      {/* Shield */}
-                      {(action === 'block' || action === 'reflect') && (
-                        <g className="animate-pulse">
-                          <path d="M 20 -40 Q 60 0 20 40" fill="none" stroke={theme.energy} strokeWidth="6" strokeLinecap="round" style={{ filter: `drop-shadow(0 0 10px ${theme.energy})` }} />
-                          <path d="M 20 -40 Q 60 0 20 40" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-                          <path d="M 30 -20 L 40 -10 L 40 10" fill="none" stroke={theme.energy} strokeWidth="1" opacity="0.6" />
-                        </g>
-                      )}
-
-                      {/* Loading Plasma Cell */}
-                      {action === 'load' && (
-                        <rect x="-2" y="20" width="8" height="12" rx="2" fill="#fff" stroke={theme.energy} strokeWidth="2" style={{ filter: `drop-shadow(0 0 8px ${theme.energy})` }} className="animate-pulse" />
-                      )}
-                    </motion.g>
-                  </g>
+                  <circle cx="0" cy="110" r={action === 'heavy-attack' ? 35 : 25} fill={theme.energy} filter="url(#energyGlow)" opacity="0.6"/>
+                  <path d={action === 'heavy-attack' ? "M -25 100 L 25 100 L 0 200 Z" : "M -15 100 L 15 100 L 0 160 Z"} fill="#fff" filter="url(#energyGlow)" />
                 </motion.g>
-              </g>
+              )}
+
+              {/* Energy Shield */}
+              {(action === 'block' || action === 'reflect') && (
+                <motion.g 
+                  initial={{ opacity: 0, scale: 0.5 }} 
+                  animate={{ opacity: 1, scale: action === 'reflect' ? 1.6 : 1.2 }} 
+                  className={action === 'block' ? "animate-pulse" : ""}
+                >
+                  <path d="M -60 110 Q 0 150 60 110 Q 0 120 -60 110 Z" fill={theme.energy} opacity="0.2" filter="url(#energyGlow)" />
+                  <path d="M -60 110 Q 0 150 60 110" fill="none" stroke={theme.energy} strokeWidth="8" strokeLinecap="round" filter="url(#energyGlow)" />
+                  <path d="M -60 110 Q 0 150 60 110" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M -40 100 Q 0 130 40 100" fill="none" stroke={theme.energy} strokeWidth="4" strokeLinecap="round" opacity="0.6" />
+                  {/* Reflection Spike */}
+                  {action === 'reflect' && (
+                    <path d="M -15 135 L 0 160 L 15 135 Z" fill="#fff" filter="url(#energyGlow)" opacity="0.9" />
+                  )}
+                </motion.g>
+              )}
+
+              {/* Loading State */}
+              {action === 'load' && (
+                <motion.g style={{ transformOrigin: '0px 110px' }} animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
+                  {/* Gathering Particles */}
+                  <motion.circle 
+                     cx="0" cy="110" r="25" 
+                     fill="none" stroke={theme.energy} strokeWidth="4" strokeDasharray="10 20"
+                     initial={{ rotate: 0, scale: 2, opacity: 0 }}
+                     animate={{ rotate: -360, scale: 1, opacity: 1 }}
+                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                     filter="url(#energyGlow)" 
+                  />
+                  <motion.circle 
+                     cx="0" cy="110" r="10" 
+                     fill={theme.energy} 
+                     initial={{ scale: 0.5, opacity: 0.5 }}
+                     animate={{ scale: 1.5, opacity: 1 }}
+                     transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+                     filter="url(#energyGlow)" 
+                  />
+                </motion.g>
+              )}
             </motion.g>
           </g>
-        </g>
+
+        </motion.g>
       </g>
     </svg>
   );
 };
 
-export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) => {
-  const playerTheme: ThemeColors = {
-    coat: '#1e3a8a', // blue-900
-    coatDark: '#172554', // blue-950
-    hat: '#451a03', // amber-950
-    pants: '#0f172a', // slate-900
-    skin: '#b45309', // amber-700
-    energy: '#06b6d4', // cyan-500
-    metal: '#334155', // slate-700
-  };
-  return <SpaceWesternCharacter action={action} theme={playerTheme} />;
+export const PlayerCharacter: React.FC<CharacterProps> = ({ action = 'normal', themeType = 'blue' }) => {
+  const playerTheme = themes[themeType] || themes.blue;
+  return <TuskMech action={action} theme={playerTheme} />;
 };
 
-export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal' }) => {
-  const enemyTheme: ThemeColors = {
-    coat: '#7f1d1d', // red-900
-    coatDark: '#450a0a', // red-950
-    hat: '#1c1917', // stone-900
-    pants: '#1c1917', // stone-900
-    skin: '#b45309',
-    energy: '#ef4444', // red-500
-    metal: '#3f3f46', // zinc-700
-  };
+export const EnemyCharacter: React.FC<CharacterProps> = ({ action = 'normal', themeType = 'red' }) => {
+  const enemyTheme = themes[themeType] || themes.red;
   return (
     <div className="scale-x-[-1]">
-      <SpaceWesternCharacter action={action} theme={enemyTheme} />
+      <TuskMech action={action} theme={enemyTheme} />
     </div>
   );
 };
+

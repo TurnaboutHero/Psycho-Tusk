@@ -63,4 +63,8 @@ export const initialState: GameState = {
   
   // Network state
   isConnected: false,
+  
+  // Appearance
+  playerAppearance: 'blue',
+  enemyAppearance: 'red',
 };

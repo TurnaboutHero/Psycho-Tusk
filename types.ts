@@ -4,9 +4,11 @@ export type GameMode = 'lobby' | 'pve' | 'pvp' | 'localPvp' | 'tutorial' | 'stat
 export type ActionType = 'load' | 'fire' | 'block';
 
 export type CharacterAction = 'normal' | 'ready' | 'hit' | 'attack' | 'heavy-attack' | 'block' | 'load' | 'reflect';
+export type CharacterTheme = 'blue' | 'red' | 'cyber' | 'desert' | 'shadow';
 
 export interface CharacterProps {
   action?: CharacterAction;
+  themeType?: CharacterTheme;
 }
 
 export interface EnemyDecision {
@@ -78,12 +80,17 @@ export interface GameState {
   
   // Network state
   isConnected: boolean;
+
+  // Appearance
+  playerAppearance: CharacterTheme;
+  enemyAppearance: CharacterTheme;
 }
 
 export type GameAction =
   | { type: 'START_GAME'; payload: { mode: 'pve' | 'localPvp' } }
   | { type: 'START_TUTORIAL' }
   | { type: 'SET_MODE'; payload: GameMode }
+  | { type: 'SET_APPEARANCE'; payload: { player: 'player1' | 'player2', appearance: CharacterTheme } }
   | { type: 'RESET_GAME' }
   | { type: 'GO_TO_LOBBY' }
   | { type: 'SHOW_STATS' }

@@ -57,9 +57,9 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
   }, [dispatch, state.roomCode]);
 
   const handleCreateRoom = async (isPublic: boolean) => {
-    const { roomCode, state } = await networkService.createRoom(isPublic);
+    const { roomCode, state: roomState } = await networkService.createRoom(isPublic, state.playerAppearance);
     dispatch({ type: 'SET_ROOM', payload: { roomCode, playerId: 'player1' } });
-    dispatch({ type: 'SYNC_STATE', payload: state });
+    dispatch({ type: 'SYNC_STATE', payload: roomState });
   };
 
   const handleJoinRoom = async (code: string) => {
@@ -68,11 +68,11 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
         setError('방 코드를 입력해주세요.');
         return;
     }
-    const { success, state } = await networkService.joinRoom(code);
-    if (success && state) {
+    const { success, state: roomState } = await networkService.joinRoom(code, state.playerAppearance);
+    if (success && roomState) {
       dispatch({ type: 'SET_ROOM', payload: { roomCode: code, playerId: 'player2' } });
-      dispatch({ type: 'SYNC_STATE', payload: state });
-      if (state.opponentJoined) {
+      dispatch({ type: 'SYNC_STATE', payload: roomState });
+      if (roomState.opponentJoined) {
         dispatch({ type: 'OPPONENT_JOINED' });
       }
     } else {
@@ -153,7 +153,7 @@ const PvpLobby: React.FC<PvpLobbyProps> = ({ state, dispatch }) => {
                 </div>
             ) : (
                 <button 
-                    onClick={() => networkService.findMatch()}
+                    onClick={() => networkService.findMatch(state.playerAppearance)}
                     className="w-full bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-bold py-5 px-6 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-3 group"
                 >
                     <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
